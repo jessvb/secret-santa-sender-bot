@@ -20,7 +20,8 @@ def get_couples(filename):
     couples = []
     with open(filename, mode='r', encoding='utf-8') as couples_file:
         for line in couples_file:
-            couples.append([line.split(",")[0].strip(), line.split(",")[1].strip()])
+            couples.append([line.split(",")[0].strip(),
+                            line.split(",")[1].strip()])
     return couples
 
 
@@ -69,6 +70,16 @@ def make_the_magic(names, couples):
     while (done == False):
         secret_names = []
         temp_names = names.copy()
+
+        #######################################################
+        #######################################################
+        # TODO DEL for next year
+        # this year i'm rigging it so that I (jess) get jon :-)
+        temp_names = names.copy()
+        secret_names.append(temp_names.pop(1))
+        #######################################################
+        #######################################################
+
         while len(temp_names) > 1:
             ind = random.randrange(len(temp_names))
             receiver = temp_names[ind]
