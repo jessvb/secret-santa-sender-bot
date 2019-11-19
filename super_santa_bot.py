@@ -63,19 +63,17 @@ def make_the_magic(names):
             receiver = temp_names[ind]
             giver = names[len(secret_names)]
             # make sure that the giver name != receiver name
-            # and that there are no couples paired together TODO
-            while receiver == giver:
-                print('same same! ' + str(ind))
-                print(giver)
-                print(receiver)
+            # and that there are no couples paired together
+            while (receiver == giver or is_couple(receiver, giver)):
                 ind = random.randrange(len(temp_names))
                 receiver = temp_names[ind]
             # add the receiver to the secret_names list
             # and remove the receiver from temp_names
             secret_names.append(temp_names.pop(ind))
-        # if the last two names aren't the same, then we're done!
+        # if the last two names aren't the same, 
+        # and aren't a couple, then we're done!
         # otherwise, restart
-        if (temp_names[0] != names[-1]):
+        if (temp_names[0] != names[-1] and not (is_couple(temp_names[0], names[-1]))):
             secret_names.append(temp_names.pop())
             done = True
 
@@ -96,54 +94,39 @@ def main():
         # get the outline/template of the email you want to send
         email_outline = read_email_outline(FILENAME_EMAIL_OUTLINE)
 
-        # print(email_outline.replace("${REC_NAME}", 'the beautiful rec name'))
+        receiver_names = make_the_magic(names)
+        print("ssb made the magic! everyone's paired up :)")
+        print("ssb just needs to make its merry way across the interwebs now...")
 
-        print("trues:")
-        print(is_couple('jon jessi0', 'elise jessicav'))
-        print(is_couple('elise jessicav', 'jon jessi0'))
-        print(is_couple('ness jess.vanb mit', 'parv jess csail'))
-        print(is_couple('parv jess csail', 'ness jess.vanb mit'))
+        # set up the smtp client
+        s = smtplib.SMTP(host='smtp.gmail.com', port=587)
+        s.starttls()
+        s.login(HOST_EMAIL, PASSWORD)
 
-        print("falses:")
-        print(is_couple('parv jess csail', 'jon jessi0'))
-        print(is_couple('jess jess.vanb', 'ness jess.vanb mit'))
-        print(is_couple('elise jessicav', 'ness jess.vanb mit'))
-        print(is_couple('jon jessi0', 'ness jess.vanb mit'))
-        print(is_couple('jon jessi0', 'parv jess csail'))
+        # personalize all the messages per-contact
+        for name, receiver_name, email in zip(names, receiver_names, emails):
+            msg = MIMEMultipart()
+            # substitute the ${GIVE_NAME} and ${REC_NAME} in the text
+            text = email_outline.replace("${GIVE_NAME}", name.title())
+            text = text.replace("${REC_NAME}", receiver_name.title())
 
-        # receiver_names = make_the_magic(names)
-        # print(names)
-        # print(receiver_names)
+            # set up the rest of the email parameters
+            msg['From']=HOST_EMAIL
+            msg['To']=email
+            msg['Subject']="Super Secret Santa Bot Message for Youuuu!"
+            msg.attach(MIMEText(text, 'plain'))
 
-        # # set up the smtp client
-        # s = smtplib.SMTP(host='smtp.gmail.com', port=587)
-        # s.starttls()
-        # s.login(HOST_EMAIL, PASSWORD)
+            # SEND IT!
+            s.send_message(msg)
 
-        # # personalize all the messages per-contact
-        # for name, email in zip(names, emails):
-        #     msg = MIMEMultipart()
-        #     # substitute the ${GIVE_NAME} and ${REC_NAME} in the text
-        #     text = email_outline.replace("${GIVE_NAME}", name.title())
-        #     text = text.replace("${REC_NAME}", "TODO")
+            del msg
 
-        #     # set up the rest of the email parameters
-        #     msg['From']=HOST_EMAIL
-        #     msg['To']=email
-        #     msg['Subject']="Test email 3"
-        #     msg.attach(MIMEText(text, 'plain'))
+        # quit the smtp session and close the connection
+        s.quit()
 
-        #     # SEND IT!
-        #     s.send_message(msg)
-
-        #     del msg
-
-        # # quit the smtp session and close the connection
-        # s.quit()
-
-        # print('MERRY CHRISTMAS! The Secret Santa Bot has done its Super Secret Send!')
+        print('MERRY CHRISTMAS! The Secret Santa Bot has done its Super Secret Send!')
     else:
-        print("Oh no! Santa Bot messed up! Edit COUPLES in the super_santa_bot.py file to fix his memory.")
+        print("Oh no! Santa Bot messed up! Edit COUPLES in the super_santa_bot.py file to fix its memory.")
 
 
 if __name__ == '__main__':
