@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+### Don't push emails and passwords to github!
+names_emails.csv
+host_email_auth.txt
