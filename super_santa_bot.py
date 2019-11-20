@@ -70,16 +70,6 @@ def make_the_magic(names, couples):
     while (done == False):
         secret_names = []
         temp_names = names.copy()
-
-        #######################################################
-        #######################################################
-        # TODO DEL for next year
-        # this year i'm rigging it so that I (jess) get jon :-)
-        temp_names = names.copy()
-        secret_names.append(temp_names.pop(1))
-        #######################################################
-        #######################################################
-
         while len(temp_names) > 1:
             ind = random.randrange(len(temp_names))
             receiver = temp_names[ind]
