@@ -103,53 +103,64 @@ def make_the_magic(names, couples):
 
 
 def main():
-    couples = get_couples(FILENAME_COUPLES)
-    # couples check
-    print('couples:')
-    for couple in couples:
-        print(couple)
-    y_n = input('these are your couples? (y/n) ')
+    # get the names and email addresses of those you want to send to
+    (names, emails) = get_names_emails(FILENAME_NAMES_EMAILS)
+    # names check
+    for (name, email) in zip(names, emails):
+        print(name + ', ' + email)
+    y_n = input('these are your people? (y/n) ')
     if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
-        # get the credentials for the host email address
-        (HOST_EMAIL, PASSWORD) = get_host_email_password(FILENAME_HOST_EMAIL_AUTH)
-        # get the names and email addresses of those you want to send to
-        (names, emails) = get_names_emails(FILENAME_NAMES_EMAILS)
-        # get the outline/template of the email you want to send
-        email_outline = read_email_outline(FILENAME_EMAIL_OUTLINE)
+        # get the couples
+        couples = get_couples(FILENAME_COUPLES)
+        # couples check
+        print('\ncouples:')
+        for couple in couples:
+            print(couple)
+        y_n = input('these are your couples? (y/n) ')
+        if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
+            # get the credentials for the host email address
+            (HOST_EMAIL, PASSWORD) = get_host_email_password(
+                FILENAME_HOST_EMAIL_AUTH)
+            # get the outline/template of the email you want to send
+            email_outline = read_email_outline(FILENAME_EMAIL_OUTLINE)
 
-        receiver_names = make_the_magic(names, couples)
-        print("ssb made the magic! everyone's paired up :)")
-        print("ssb just needs to make its merry way across the interwebs now...")
+            receiver_names = make_the_magic(names, couples)
+            print("ssb made the magic! everyone's paired up :)")
+            print("ssb just needs to make its merry way across the interwebs now...")
 
-        # set up the smtp client
-        s = smtplib.SMTP(host='smtp.gmail.com', port=587)
-        s.starttls()
-        s.login(HOST_EMAIL, PASSWORD)
+            # set up the smtp client
+            s = smtplib.SMTP(host='smtp.gmail.com', port=587)
+            s.starttls()
+            s.login(HOST_EMAIL, PASSWORD)
 
-        # personalize all the messages per-contact
-        for name, receiver_name, email in zip(names, receiver_names, emails):
-            msg = MIMEMultipart()
-            # substitute the ${GIVE_NAME} and ${REC_NAME} in the text
-            text = email_outline.replace("${GIVE_NAME}", name.title())
-            text = text.replace("${REC_NAME}", receiver_name.title())
+            # personalize all the messages per-contact
+            for name, receiver_name, email in zip(names, receiver_names, emails):
+                msg = MIMEMultipart()
+                # substitute the ${GIVE_NAME} and ${REC_NAME} in the text
+                text = email_outline.replace("${GIVE_NAME}", name.title())
+                text = text.replace("${REC_NAME}", receiver_name.title())
 
-            # set up the rest of the email parameters
-            msg['From'] = HOST_EMAIL
-            msg['To'] = email
-            msg['Subject'] = "Super Secret Santa Bot Message for Youuuu!"
-            msg.attach(MIMEText(text, 'plain'))
+                # set up the rest of the email parameters
+                msg['From'] = HOST_EMAIL
+                msg['To'] = email
+                msg['Subject'] = "Super Secret Santa Bot Message for Youuuu!"
+                msg.attach(MIMEText(text, 'plain'))
 
-            # SEND IT!
-            s.send_message(msg)
+                # SEND IT!
+                s.send_message(msg)
 
-            del msg
+                del msg
 
-        # quit the smtp session and close the connection
-        s.quit()
+            # quit the smtp session and close the connection
+            s.quit()
 
-        print('MERRY CHRISTMAS! The Secret Santa Bot has done its Super Secret Send!')
+            print('MERRY CHRISTMAS! The Secret Santa Bot has done its Super Secret Send!')
+        else:
+            print(
+                "Oh no! Santa Bot messed up! Edit the couples.txt file to fix its memory.")
     else:
-        print("Oh no! Santa Bot messed up! Edit COUPLES in the super_santa_bot.py file to fix its memory.")
+        print(
+            "Oh no! Santa Bot messed up! Edit the names_emails.csv file to fix its memory.")
 
 
 if __name__ == '__main__':
