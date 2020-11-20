@@ -103,6 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# MacOS
+.DS_Store
 
 ### Don't push emails and passwords to github!
 names_emails.csv

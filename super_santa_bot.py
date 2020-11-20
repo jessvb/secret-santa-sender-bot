@@ -68,6 +68,7 @@ def make_the_magic(names, couples):
     done = False
 
     while (done == False):
+        print('trying to make the magic! (attempting to pair everyone up...)')
         secret_names = []
         temp_names = names.copy()
         while len(temp_names) > 1:
@@ -88,6 +89,8 @@ def make_the_magic(names, couples):
         if (temp_names[0] != names[-1] and not (is_couple(temp_names[0], names[-1], couples))):
             secret_names.append(temp_names.pop())
             done = True
+        else:
+            print('That didn\'t quite work. Let me try again!')
 
     return secret_names
 

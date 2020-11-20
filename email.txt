@@ -1,8 +1,6 @@
-Yoooo ${GIVE_NAME}! This is the Super Santa Bot! I've got KFC in my belly, and present-givers on my list!
+A Very Merry Christmas to you, ${GIVE_NAME}! This is the Super Santa Bot!
 
-MERRY CHRISTMAS!
-
-I'm here to tell you that you have the Super Secret opportunity to get someone a Super Spectacular present! I have personally selected someone Super Special for you <3 (and didn't even tell jess about it, I promise ;);) )
+I'm here to tell you that you have the Super Secret opportunity to get someone a Super Spectacular present! I have personally selected someone Super Special for you <3 (and didn't even tell Jess about it, I promise!)
 
 Okay, get ready...
 
@@ -138,28 +136,25 @@ DUN DUN DUN DUUUUUUUN! (Cue Legend of Zelda treasure chest soundbyte)
 !!!!!!!!! ${REC_NAME} !!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-YAYAY! I hope you got someone cool. Personally, I love that person a lot <3 (or at the very least, I'm pretty sure I will, once I get to know them!) 
+YAYAY! I hope you got someone cool. Personally, I think they're pretty great!
 
 And now, for the important stuff:
 
 *** DA RULES ***
 - Get your Secret Someone something special
-- Sappy things are great
-- Silly things are great
-- Sneaky things are great
-- BUT ABOVE ALL!
-- Make sure it's filled with KFC-- I mean, love <3 and under (or approximately) $30.00 USD
-(I may or may not have chosen this number arbitrarily... By the power invested in me, the author of this algorithm, I choose you, $30USD!)
+- Sappy, silly and sneaky gifts are 100% welcome
+- If you're stuck, almost everyone loves chocolate
+- AND ABOVE ALL!
+- Make sure your gift is filled with love, Christmas cheer, and under (or approximately) $25.00 CAD
 
 And just in case the pressure is getting to you, here are some wise words from our beloved friend, Mr. Grinch:
 
 "Maybe Christmas", he thought, "doesn't come from a store. Maybe Christmas... Perhaps... Means a little bit more."
 
-Soooo, if you don't get ${REC_NAME} the most fantastically fantastic, wonderfully wonderous gift ever, I guessssss they might just still be okay with that, and might just still consider keeping you around until next year ;) 
+Soooo, if your gift for ${REC_NAME} turns out to be a little less-than-absolutely-wonderfully-perfect (and/or the gift you receive turns out to be a little less-than-absolutely-wonderfully-perfect), think back to Mr. Grinch's wise words—and remember the true Reason for the season :)
 
-
-Alright! Thanks for bearing with the Super Santa Bot :-) and Merriest of Merry Christmases!
+Alright! Thanks for bearing with the Super Santa Bot :-), Merriest of Merry Christmases, and can't wait to spend this special season (physically-distanced or not) with all of you!
 
 --
-Peace.
-- ssb
+Peace & love,
+- Super Santa Bot
