@@ -33,14 +33,12 @@ def get_names_emails(filename):
             names.append(line.split(",")[0].strip())
             emails.append(line.split(",")[1].split("\n")[0].strip())
     return names, emails
-# print(get_names_emails(FILENAME_NAMES_EMAILS))
 
 
 def read_email_outline(filename):
     with open(filename, 'r', encoding='utf-8') as template_file:
         template_file_txt = template_file.read()
     return template_file_txt
-# print(read_email_outline(FILENAME_EMAIL_OUTLINE))
 
 
 def get_host_email_password(filename):
@@ -49,11 +47,8 @@ def get_host_email_password(filename):
         email = txt.split('\n')[0]
         password = txt.split('\n')[1]
     return (email, password)
-# print(get_host_email_password(FILENAME_HOST_EMAIL_AUTH))
 
 # make sure couples aren't paired up
-
-
 def is_couple(name1, name2, couples):
     isCoup = False
     for couple in couples:
@@ -62,8 +57,6 @@ def is_couple(name1, name2, couples):
     return isCoup
 
 # the secret santa selection!
-
-
 def make_the_magic(names, couples):
     done = False
 
@@ -109,6 +102,13 @@ def main():
         print('\ncouples:')
         for couple in couples:
             print(couple)
+        print('\ncouples comparison test (this should print all True couples twice):')
+        for name1 in names:
+            for name2 in names:
+                if (name1 != name2):
+                    if (is_couple(name1,name2,couples)):
+                        print(f'    {name1} {name2} is couple? {is_couple(name1,name2,couples)}')
+
         y_n = input('these are your couples? (y/n) ')
         if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
             # get the credentials for the host email address
