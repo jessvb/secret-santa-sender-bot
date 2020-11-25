@@ -35,3 +35,8 @@ python super_santa_bot.py
     - Make sure these are correct, and then type `y` and hit enter in the command line
     - Next, a list of couples will appear—Make sure they're correct and hit `y` and enter
 And off into the world your emails will go! 🦌🦌🦌🦌🦌🛷🎅 Merry Christmas!
+
+## notes and things to do
+You might notice the code is not optimized speed-wise (it also doesn't need to be, assuming the Santa Bot only needs to visit a few dozen inboxes 😉), but feel free to contribute, if you feel like doing some Christmas-break optimization!
+
+There's also a bug where it hangs— I haven't looked into what's actually going on here (probably some reindeer chomping on the code again 🌱 🦌 😅), but if you run into this, all you have to do is hit `ctrl+c` and re-run the program, and in all likelihood, Santa will get back to soaring 😉 
