@@ -132,12 +132,14 @@ def main():
                 # substitute the ${GIVE_NAME} and ${REC_NAME} in the text
                 text = email_outline.replace("${GIVE_NAME}", name.title())
                 text = text.replace("${REC_NAME}", receiver_name.title())
+                text = "<html>\n<head></head>\n<body>\n" + text
+                text = text + "\n</body>\n</html>"
 
                 # set up the rest of the email parameters
                 msg['From'] = HOST_EMAIL
                 msg['To'] = email
                 msg['Subject'] = "Super Secret Santa Bot Message for Youuuu!"
-                msg.attach(MIMEText(text, 'plain'))
+                msg.attach(MIMEText(text, 'html'))
 
                 # SEND IT!
                 s.send_message(msg)

@@ -1,160 +1,162 @@
 A Very Merry Christmas to you, ${GIVE_NAME}! This is the Super Santa Bot!
-
-I'm here to tell you that you have the Super Secret opportunity to get someone a Super Spectacular present! I have personally selected someone Super Special for you <3 (and didn't even tell Jess about it, I promise!)
-
-Okay, get ready...
-
-
-Your Super Secret someone is... 
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-Yes, I'm making you scroll just like those awesome viral emails from the 90's...
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-
-
-Dun dun dun...
-
-
-
-
-
-
-DUN DUN DUN DUUUUUUUN! (Cue Legend of Zelda treasure chest soundbyte)
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!! ${REC_NAME} !!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-YAYAY! I hope you got someone cool. Personally, I think they're pretty great!
-
-And now, for the important stuff:
-
-*** DA RULES ***
-- Get your Secret Someone something special
-- Sappy, silly and sneaky gifts are 100% welcome
-- If you're stuck, almost everyone loves chocolate
-- AND ABOVE ALL!
-- Make sure your gift is filled with love, Christmas cheer, and under (or approximately) $25.00 CAD
-
-And just in case the pressure is getting to you, here are some wise words from our beloved friend, Mr. Grinch:
-
-"Maybe Christmas", he thought, "doesn't come from a store. Maybe Christmas... Perhaps... Means a little bit more."
-
-Soooo, if your gift for ${REC_NAME} turns out to be a little less-than-absolutely-wonderfully-perfect (and/or the gift you receive turns out to be a little less-than-absolutely-wonderfully-perfect), think back to Mr. Grinch's wise words—and remember the true Reason for the season :)
-
-Alright! Thanks for bearing with the Super Santa Bot :-), Merriest of Merry Christmases, and can't wait to spend this special season (physically-distanced or not) with all of you!
-
---
-Peace & love,
-- Super Santa Bot
+<br>
+<br>I'm here to tell you that you have the Super Secret opportunity to get someone a Super Spectacular present! I have personally selected someone Super Special for you <3 (and didn't even tell Jess about it, I promise!)
+<br>
+<br>Okay, get ready...
+<br>
+<br>
+<br>Your Super Secret someone is... 
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>Yes, I'm making you scroll just like those awesome viral emails from the 90's...
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>Dun dun dun...
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>DUN DUN DUN DUUUUUUUN! (Cue Legend of Zelda treasure chest soundbyte)
+<br>
+<br>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+<br>!!!!!!!!! ${REC_NAME} !!!!!!!!!
+<br>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+<br>
+<br>YAYAY! I hope you got someone awesome. Personally, I think they're pretty great!
+<br>
+<br>Don't forget to update your wishlist on <a href="https://youtu.be/dQw4w9WgXcQ">our spreadsheet</a>!
+<br>
+<br>And now, for the important stuff:
+<br>
+<br>*** DA RULES ***
+<br>- Get your Secret Someone something special
+<br>- Sappy, silly and sneaky gifts are 100% welcome
+<br>- If you're stuck, almost everyone loves chocolate
+<br>- AND ABOVE ALL!
+<br>- Make sure your gift is filled with love, Christmas cheer, and under (or approximately) $25.00 CAD
+<br>
+<br>And just in case the pressure is getting to you, here are some wise words from our beloved friend, Mr. Grinch:
+<br>
+<br>"Maybe Christmas", he thought, "doesn't come from a store. Maybe Christmas... Perhaps... Means a little bit more."
+<br>
+<br>Soooo, if your gift for ${REC_NAME} turns out to be a little less-than-absolutely-wonderfully-perfect (and/or the gift *you* receive turns out to be a little less-than-absolutely-wonderfully-perfect), think back to Mr. Grinch's wise words—and remember the true Reason for the season :)
+<br>
+<br>Alright! Thanks for bearing with the Super Santa Bot :-), Merriest of Merry Christmases, and can't wait to spend this special season (physically-distanced or not) with all of you!
+<br>
+<br>--
+<br>Peace & love,
+<br>- Super Santa Bot
