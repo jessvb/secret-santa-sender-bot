@@ -108,4 +108,5 @@ venv.bak/
 
 ### Don't push emails and passwords to github!
 names_emails.csv
+couples.txt
 host_email_auth.txt

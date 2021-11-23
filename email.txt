@@ -1,152 +1,49 @@
-A Very Merry Christmas to you, ${GIVE_NAME}! This is the Super Santa Bot!
+MERRY CHRISTMAS, ${GIVE_NAME}!
 <br>
-<br>I'm here to tell you that you have the Super Secret opportunity to get someone a Super Spectacular present! I have personally selected someone Super Special for you <3 (and didn't even tell Jess about it, I promise!)
+<br>My name is Buddy. What’s your favourite colour? 
 <br>
-<br>Okay, get ready...
+<br>Actually, I’m Buddy the Elf 2.0. After a sparkly career in Santa’s Workshop, the 6’3” human Buddy retired, but not before designing me: an AI Elf Bot. While all the other elves are busy iterating on candy canes, chocolates, and toys, and while Santa is practicing routes with the reindeer to get ready for the big day, I get to write ALL. SANTA’S. MAIL. Actually, me and my arctic puffin, George.  
 <br>
+<br>I can’t wait for Christmas! I have the WHOLE day planned! First we make snow angels for two hours, and then we’ll go ice skating, and then we’ll eat a whole roll of Tollhouse Cookie Dough as fast as we can, and then to finish, we’ll snuggle!
 <br>
-<br>Your Super Secret someone is... 
+<br>George and I have travelled through the seven levels of the candy cane forest to deliver a very special message, just for you. This year, YOU get to be Santa! Oh My Gosh! I know! I know! Shhh! It’s a secret. Not the real Santa, but you do get to secretly spread joy and cheer to someone very, very special and make them feel warm inside so their tongue swells. Okay, here we go:
 <br>
+<br>Get ready...
 <br>
 <br>
+<br>Your secret special human is... 
 <br>
-<br>Dun dun dun...
 <br>
 <br>
+<br><strong>${REC_NAME}!!!!!!!!!</strong>
 <br>
 <br>
+<br>YAAAAAY! They’re amazing! I’m so excited! 
 <br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>Yes, I'm making you scroll just like those awesome viral emails from the 90's...
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Dun dun dun...
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>DUN DUN DUN DUUUUUUUN! (Cue Legend of Zelda treasure chest soundbyte)
-<br>
-<br>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-<br>!!!!!!!!! ${REC_NAME} !!!!!!!!!
-<br>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-<br>
-<br>YAYAY! I hope you got someone awesome. Personally, I think they're pretty great!
-<br>
-<br>Don't forget to update your wishlist on <a href="https://youtu.be/dQw4w9WgXcQ">our spreadsheet</a>!
+<br>You get to give them the best gift! Don't forget to update your wishlist on <a href="https://todo-insert-link.com">our spreadsheet</a>!
 <br>
 <br>And now, for the important stuff:
 <br>
-<br>*** DA RULES ***
-<br>- Get your Secret Someone something special
-<br>- Sappy, silly and sneaky gifts are 100% welcome
-<br>- If you're stuck, almost everyone loves chocolate
-<br>- AND ABOVE ALL!
+<br><strong>*** RULES ***</strong>
+<br> - Treat every day like Christmas;
+<br> - There’s room for everyone on the nice list; and, 
+<br> - The best way to spread Christmas cheer is singing loud for all to hear!
+<br>
+<br> Oh wait! Those are the rules for elves! Try this:
+<br>
+<br> <strong>*****RULES FOR HUMAN SANTAS*****</strong>
+<br> - Get your Secret Human something special
+<br> - Sappy, silly and sneaky gifts are 100% welcome
+<br> - If you do buy food, we elves like to stick to the four main food groups: candy, candy canes, candy corn, and syrup. 
+<br>
+<br> AND ABOVE ALL!
+<br>
+<br>- Save your roses for Boxing Day, Bachelor Nation!
+<br>
+<br> No, that’s not quite right, George, is it? How about this?
+<br>
+<br> AND ABOVE ALL!
+<br>
 <br>- Make sure your gift is filled with love, Christmas cheer, and under (or approximately) $25.00 CAD
 <br>
 <br>And just in case the pressure is getting to you, here are some wise words from our beloved friend, Mr. Grinch:
@@ -155,8 +52,5 @@ A Very Merry Christmas to you, ${GIVE_NAME}! This is the Super Santa Bot!
 <br>
 <br>Soooo, if your gift for ${REC_NAME} turns out to be a little less-than-absolutely-wonderfully-perfect (and/or the gift *you* receive turns out to be a little less-than-absolutely-wonderfully-perfect), think back to Mr. Grinch's wise words—and remember the true Reason for the season :)
 <br>
-<br>Alright! Thanks for bearing with the Super Santa Bot :-), Merriest of Merry Christmases, and can't wait to spend this special season (physically-distanced or not) with all of you!
-<br>
-<br>--
-<br>Peace & love,
-<br>- Super Santa Bot
+<br>Merry Christmas!
+<br>- Buddy 2.0

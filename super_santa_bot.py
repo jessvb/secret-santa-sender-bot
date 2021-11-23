@@ -50,10 +50,15 @@ def get_host_email_password(filename):
 
 # make sure couples aren't paired up
 def is_couple(name1, name2, couples):
+    name1 = name1.strip()
+    name2 = name2.strip()
     isCoup = False
     for couple in couples:
-        if(name1 == couple[0] and name2 == couple[1] or name1 == couple[1] and name2 == couple[0]):
+        testname1 = couple[0].strip()
+        testname2 = couple[1].strip()
+        if((name1 == testname1 and name2 == testname2) or (name1 == testname2 and name2 == testname1)):
             isCoup = True
+            break
     return isCoup
 
 # the secret santa selection!
@@ -91,6 +96,9 @@ def make_the_magic(names, couples):
 def main():
     # get the names and email addresses of those you want to send to
     (names, emails) = get_names_emails(FILENAME_NAMES_EMAILS)
+    # remove strange extra first character that appears when importing csv file
+    names[0] = names[0][1:]
+
     # names check
     for (name, email) in zip(names, emails):
         print(name + ', ' + email)
@@ -98,6 +106,7 @@ def main():
     if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
         # get the couples
         couples = get_couples(FILENAME_COUPLES)
+
         # couples check
         print('\ncouples:')
         for couple in couples:
