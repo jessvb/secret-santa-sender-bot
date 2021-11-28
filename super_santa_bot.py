@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 import random
 
 FILENAME_NAMES_EMAILS = "names_emails.csv"
-FILENAME_EMAIL_OUTLINE = "email.txt"
+FILENAME_EMAIL_OUTLINE = "email.html"
 FILENAME_HOST_EMAIL_AUTH = "host_email_auth.txt"
 FILENAME_COUPLES = "couples.txt"
 
@@ -147,7 +147,7 @@ def main():
                 # set up the rest of the email parameters
                 msg['From'] = HOST_EMAIL
                 msg['To'] = email
-                msg['Subject'] = "Super Secret Santa Bot Message for Youuuu!"
+                msg['Subject'] = "Son of a nutcracker! Christmas is almost here!"
                 msg.attach(MIMEText(text, 'html'))
 
                 # SEND IT!
