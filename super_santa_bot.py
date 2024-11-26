@@ -9,11 +9,28 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 # for randomly selecting a secret recipient <3
 import random
+# for calculating the number of days until Christmas
+from datetime import datetime as dt
 
-FILENAME_NAMES_EMAILS = "names_emails.csv"
 FILENAME_EMAIL_OUTLINE = "email.html"
-FILENAME_HOST_EMAIL_AUTH = "host_email_auth.txt"
-FILENAME_COUPLES = "couples.txt"
+FILENAME_NAMES_EMAILS = "additional_files/names_emails.csv"
+FILENAME_HOST_EMAIL_AUTH = "additional_files/host_email_auth.txt"
+FILENAME_COUPLES = "additional_files/couples.txt"
+
+today = dt.today()
+this_year = today.year
+christmas_day = dt.strptime(f"{this_year}/12/25", "%Y/%m/%d")
+NUM_DAYS_UNTIL_CHRISTMAS = (christmas_day - today).days + 1
+
+wishlists_filename = "additional_files/wishlistslink.txt"
+WISHLISTS_LINK = ""
+with open(wishlists_filename, mode='r', encoding='utf-8') as f:
+    WISHLISTS_LINK = f.readline()
+
+emailtitle_filename = "additional_files/emailtitle.txt"
+EMAIL_TITLE = ""
+with open(emailtitle_filename, mode='r', encoding='utf-8') as f:
+    EMAIL_TITLE = f.readline()
 
 
 def get_couples(filename):
@@ -94,77 +111,95 @@ def make_the_magic(names, couples):
 
 
 def main():
-    # get the names and email addresses of those you want to send to
-    (names, emails) = get_names_emails(FILENAME_NAMES_EMAILS)
-    # remove strange extra first character that appears when importing csv file
-    names[0] = names[0][1:]
-
-    # names check
-    for (name, email) in zip(names, emails):
-        print(name + ', ' + email)
-    y_n = input('these are your people? (y/n) ')
+    # date check
+    print(f"""Today is: {today}
+          This year is: {this_year}
+          That means there's only {NUM_DAYS_UNTIL_CHRISTMAS} days until Christmas!!!
+          """)
+    
+    # wishlists link check
+    y_n = input(f'this is the wishlists link {WISHLISTS_LINK} ? (y/n) ')
     if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
-        # get the couples
-        couples = get_couples(FILENAME_COUPLES)
 
-        # couples check
-        print('\ncouples:')
-        for couple in couples:
-            print(couple)
-        print('\ncouples comparison test (this should print all True couples twice):')
-        for name1 in names:
-            for name2 in names:
-                if (name1 != name2):
-                    if (is_couple(name1,name2,couples)):
-                        print(f'    {name1} {name2} is couple? {is_couple(name1,name2,couples)}')
-
-        y_n = input('these are your couples? (y/n) ')
+        # email title check
+        y_n = input(f'this is the email title "{EMAIL_TITLE}"? (y/n) ')
         if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
-            # get the credentials for the host email address
-            (HOST_EMAIL, PASSWORD) = get_host_email_password(
-                FILENAME_HOST_EMAIL_AUTH)
-            # get the outline/template of the email you want to send
-            email_outline = read_email_outline(FILENAME_EMAIL_OUTLINE)
 
-            receiver_names = make_the_magic(names, couples)
-            print("ssb made the magic! everyone's paired up :)")
-            print("ssb just needs to make its merry way across the interwebs now...")
+            # get the names and email addresses of those you want to send to
+            (names, emails) = get_names_emails(FILENAME_NAMES_EMAILS)
+            # remove strange extra first character that appears when importing csv file
+            names[0] = names[0][1:]
 
-            # set up the smtp client
-            s = smtplib.SMTP(host='smtp.gmail.com', port=587)
-            s.starttls()
-            s.login(HOST_EMAIL, PASSWORD)
+            # names check
+            for (name, email) in zip(names, emails):
+                print(name + ', ' + email)
+            y_n = input('these are your people? (y/n) ')
+            if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
+                # get the couples
+                couples = get_couples(FILENAME_COUPLES)
 
-            # personalize all the messages per-contact
-            for name, receiver_name, email in zip(names, receiver_names, emails):
-                msg = MIMEMultipart()
-                # substitute the ${GIVE_NAME} and ${REC_NAME} in the text
-                text = email_outline.replace("${GIVE_NAME}", name.title())
-                text = text.replace("${REC_NAME}", receiver_name.title())
-                text = "<html>\n<head></head>\n<body>\n" + text
-                text = text + "\n</body>\n</html>"
+                # couples check
+                print('\ncouples:')
+                for couple in couples:
+                    print(couple)
+                print('\ncouples comparison test (this should print all True couples twice):')
+                for name1 in names:
+                    for name2 in names:
+                        if (name1 != name2):
+                            if (is_couple(name1,name2,couples)):
+                                print(f'    {name1} {name2} is couple? {is_couple(name1,name2,couples)}')
 
-                # set up the rest of the email parameters
-                msg['From'] = HOST_EMAIL
-                msg['To'] = email
-                msg['Subject'] = "Son of a nutcracker! Christmas is almost here!"
-                msg.attach(MIMEText(text, 'html'))
+                y_n = input('these are your couples? (y/n) ')
+                if (y_n == 'y' or y_n == 'yes' or y_n == 'Y' or y_n == 'Yes'):
+                    # get the credentials for the host email address
+                    (HOST_EMAIL, PASSWORD) = get_host_email_password(
+                        FILENAME_HOST_EMAIL_AUTH)
+                    # get the outline/template of the email you want to send
+                    email_outline = read_email_outline(FILENAME_EMAIL_OUTLINE)
 
-                # SEND IT!
-                s.send_message(msg)
+                    receiver_names = make_the_magic(names, couples)
+                    print("ssb made the magic! everyone's paired up :)")
+                    print("ssb just needs to make its merry way across the interwebs now...")
 
-                del msg
+                    # set up the smtp client
+                    s = smtplib.SMTP(host='smtp.gmail.com', port=587)
+                    s.starttls()
+                    s.login(HOST_EMAIL, PASSWORD)
 
-            # quit the smtp session and close the connection
-            s.quit()
+                    # personalize all the messages per-contact
+                    for name, receiver_name, email in zip(names, receiver_names, emails):
+                        msg = MIMEMultipart()
+                        # substitute the ${GIVE_NAME}, ${REC_NAME}, etc. in the text
+                        text = email_outline.replace("${GIVE_NAME}", name.title())
+                        text = text.replace("${REC_NAME}", receiver_name.title())
+                        text = text.replace("${NUM_DAYS_BEFORE_CHRISTMAS}", str(NUM_DAYS_UNTIL_CHRISTMAS))
+                        text = text.replace("${WISHLISTS_LINK}", WISHLISTS_LINK)
+                        text = "<html>\n<head></head>\n<body>\n" + text
+                        text = text + "\n</body>\n</html>"
 
-            print('MERRY CHRISTMAS! The Secret Santa Bot has done its Super Secret Send!')
+                        # set up the rest of the email parameters
+                        msg['From'] = HOST_EMAIL
+                        msg['To'] = email
+                        msg['Subject'] = EMAIL_TITLE
+                        msg.attach(MIMEText(text, 'html'))
+
+                        # SEND IT!
+                        s.send_message(msg)
+
+                        del msg
+
+                    # quit the smtp session and close the connection
+                    s.quit()
+
+                    print('MERRY CHRISTMAS! The Secret Santa Bot has done its Super Secret Send!')
+                else:
+                    print("Oh no! Santa Bot messed up! Edit the couples.txt file to fix its memory.")
+            else:
+                print("Oh no! Santa Bot messed up! Edit the names_emails.csv file to fix its memory.")
         else:
-            print(
-                "Oh no! Santa Bot messed up! Edit the couples.txt file to fix its memory.")
+            print("Oh no! Santa Bot messed up! Edit the emailtitle.txt file to fix its memory.")
     else:
-        print(
-            "Oh no! Santa Bot messed up! Edit the names_emails.csv file to fix its memory.")
+        print("Oh no! Santa Bot messed up! Edit the WISHLISTSlink.txt file to fix its memory.")
 
 
 if __name__ == '__main__':
