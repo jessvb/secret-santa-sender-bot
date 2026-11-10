@@ -36,7 +36,6 @@ python super_santa_bot.py
 ```
 
 - In the console, a number of checks will come up; for example, a list of names and emails will appear
-    - If the first name is missing its first letter (e.g., "Santa" ends up being "anta"), add an extra first letter in the names_emails.csv to this name and it should work (e.g., put "SSanta" instead of "Santa"). This is a [known bug](https://github.com/jessvb/secret-santa-sender-bot/issues/1).
 - Make sure these are correct, and then type `y` and hit enter in the command line
 - Next, a list of couples will appear—Make sure they're correct and hit `y` and enter
 - Continue doing this until the Sender Bot is ready to send
@@ -46,4 +45,6 @@ And off into the world your emails will go! 🦌🦌🦌🦌🦌🛷🎅 Merry C
 ## notes and things to do
 You might notice the code is not optimized speed-wise (it also doesn't need to be, assuming the Santa Bot only needs to visit a few dozen inboxes 😉), but feel free to contribute, if you feel like doing some Christmas-break optimization!
 
-There's also a bug where it hangs— I haven't looked into what's actually going on here (probably some reindeer chomping on the code again 🌱 🦌 😅), but if you run into this, all you have to do is hit `ctrl+c` and re-run the program, and in all likelihood, Santa will get back to soaring 😉
+Run `python super_santa_bot.py --dry-run` to check your inputs and make a valid draw without sending anything (assignments are never printed). Run the tests with `python -m unittest`.
+
+If some emails fail to send, the bot lists the addresses (not who got whom) so you can follow up by hand — re-running would re-draw for everyone.
