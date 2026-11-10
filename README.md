@@ -31,11 +31,16 @@ Mr. Claus, Mrs. Claus: Elf1, Elf2
     - `${NUM_DAYS_UNTIL_CHRISTMAS}`: days left until Christmas (based on the date the email is sent)
     - `${WISHLISTS_LINK}`: the text from `wishlistslink.txt`
 8. Add some Christmas cheer ✨ (Note: this step is **NOT OPTIONAL**!)
-9. (Recommended) Take a practice lap! This checks everything, makes a draw, and prints who-gives-to-who so you can eyeball it (spoilers! 🙈), but sends nothing. A real run never prints the pairs:
+9. (Recommended) Take a practice lap! This checks everything, makes a draw, and prints who-gives-to-who so you can eyeball it (spoilers! 🙈), but sends nothing. A real run never prints the pairs. (`--dry-run` and `--dry-run-send` can't be combined; pick one!)
 ```
 python super_santa_bot.py --dry-run
 ```
-10. Let the Super Santa Bot do its thing! In the root directory:
+10. (Also recommended) Do a dress rehearsal with *real* emails! `dry_run_names_emails.csv` (same `name,email` format as `names_emails.csv`) is a separate list of test recipients—put in a few addresses you can read yourself (like `you+mary@gmail.com`). Then:
+```
+python super_santa_bot.py --dry-run-send
+```
+    This does a dry run (prints the draw, just like `--dry-run`), then—after asking one more time—actually sends the emails, but **only** to the people on the dry-run list, with `DRY RUN: ` stuck on the front of the subject and the start of the email so nobody mistakes them for the real thing. Your real `names_emails.csv` isn't touched. The draw is made among the dry-run people, and only the couples/families from your real files who are *all* on the dry-run list get applied (so keep a few real names on it if you want to see those rules in action!). Heads up: it does use your real `host_email_auth.txt`, since it really sends. The dry-run list is gitignored too, of course.
+11. Let the Super Santa Bot do its thing! In the root directory:
 ```
 python super_santa_bot.py
 ```

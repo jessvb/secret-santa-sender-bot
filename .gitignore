@@ -110,6 +110,7 @@ venv.bak/
 ### Only the *.template.* files are tracked; --init copies them to these.
 ### (email.html is deliberately committed: it's our record of each year's email.)
 additional_files/names_emails.csv
+additional_files/dry_run_names_emails.csv
 additional_files/couples.txt
 additional_files/children.txt
 additional_files/host_email_auth.txt

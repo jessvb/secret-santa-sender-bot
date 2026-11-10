@@ -2,7 +2,7 @@ import random
 import unittest
 
 from super_santa_bot import (check_assignment, days_until_christmas, get_families,
-                             is_couple, is_parent_child, make_the_magic,
+                             filter_to_names, is_couple, is_parent_child, mark_dry_run, make_the_magic,
                              render_email, validate_inputs)
 from datetime import date
 
@@ -93,6 +93,22 @@ class Families(unittest.TestCase):
         finally:
             os.unlink(f.name)
         self.assertEqual(get_families("/nonexistent.txt"), [])
+
+
+class DryRunSend(unittest.TestCase):
+    def test_mark(self):
+        subj, body = mark_dry_run("Hi", "<html>\n<head></head>\n<body>\nhello\n</body>\n</html>")
+        self.assertEqual(subj, "DRY RUN: Hi")
+        self.assertIn("<body>\n<p><strong>DRY RUN: </strong>", body)
+        self.assertIn("hello", body)
+
+    def test_filter(self):
+        c, f = filter_to_names(["mary", "Jude", "Elf1"], COUPLES, FAMILIES)
+        self.assertEqual(c, [])  # Joseph/Mr. Claus not on the list
+        self.assertEqual(f, [(["Mary"], ["Jude"])])
+        c, f = filter_to_names(["Mary", "Joseph", "Zed"], COUPLES, FAMILIES)
+        self.assertEqual(c, [("Mary", "Joseph")])
+        self.assertEqual(f, [])  # no kids on the list -> family dropped
 
 
 class Validation(unittest.TestCase):

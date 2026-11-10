@@ -1,0 +1,12 @@
+# Test recipients for `python super_santa_bot.py --dry-run-send`.
+#   name,email
+# The draw is done among these people and the emails (marked "DRY RUN: ") go ONLY to
+# these addresses, so use addresses you can read yourself (e.g. you+mary@gmail.com).
+# Reuse real names if you like: couples/families from your real files are applied
+# to whoever is on this list.
+Mary,you+mary@example.com
+Joseph,you+joseph@example.com
+Rudolf,you+rudolf@example.com
+Dasher,you+dasher@example.com
+Blitzen,you+blitzen@example.com
+James,you+james@example.com

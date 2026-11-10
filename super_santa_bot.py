@@ -18,6 +18,8 @@ from email.mime.text import MIMEText
 
 FILENAME_EMAIL_OUTLINE = "additional_files/email.html"
 FILENAME_NAMES_EMAILS = "additional_files/names_emails.csv"
+FILENAME_DRY_RUN_NAMES_EMAILS = "additional_files/dry_run_names_emails.csv"
+DRY_RUN_PREFIX = "DRY RUN: "
 FILENAME_HOST_EMAIL_AUTH = "additional_files/host_email_auth.txt"
 FILENAME_COUPLES = "additional_files/couples.txt"
 FILENAME_CHILDREN = "additional_files/children.txt"
@@ -260,6 +262,27 @@ def html_to_plain(markup):
     return html.unescape(text).strip()
 
 
+def mark_dry_run(subject, html_body):
+    """Make test emails impossible to mistake for the official ones."""
+    banner = (f"<p><strong>{DRY_RUN_PREFIX}</strong>"
+              "(this is only a test of the Secret Santa Bot, not the official message!)</p>\n")
+    return DRY_RUN_PREFIX + subject, html_body.replace("<body>\n", "<body>\n" + banner, 1)
+
+
+def filter_to_names(names, couples, families):
+    """For --dry-run-send, the test list is often a small stand-in for the real
+    one. Keep only the couples/families made up of people on that list."""
+    known = {n.lower() for n in names}
+    kept_couples = [(a, b) for a, b in couples if a.lower() in known and b.lower() in known]
+    kept_families = []
+    for parents, children in families:
+        ps = [x for x in parents if x.lower() in known]
+        cs = [x for x in children if x.lower() in known]
+        if ps and cs:
+            kept_families.append((ps, cs))
+    return kept_couples, kept_families
+
+
 def build_message(host_email, to_email, subject, html_body):
     msg = MIMEMultipart("alternative")
     msg["From"] = host_email
@@ -301,10 +324,15 @@ def main():
     parser = argparse.ArgumentParser(description="Secret Santa Bot")
     parser.add_argument("--init", action="store_true",
                         help="create your real config files from the templates")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="check inputs and make a valid draw, but send nothing "
-                             "(prints the draw so you can eyeball it; real runs never do)")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true",
+                      help="check inputs and make a valid draw, but send nothing "
+                           "(prints the draw so you can eyeball it; real runs never do)")
+    mode.add_argument("--dry-run-send", action="store_true",
+                      help=f"like --dry-run, but really sends the emails to the people in "
+                           f"{FILENAME_DRY_RUN_NAMES_EMAILS} instead, marked '{DRY_RUN_PREFIX}'")
     args = parser.parse_args()
+    dry = args.dry_run or args.dry_run_send
     if args.init:
         init_files()
         return
@@ -320,20 +348,31 @@ def main():
     if not confirm(f'this is the email title "{email_title}"?'):
         sys.exit(f"Edit {FILENAME_EMAIL_TITLE} to fix Santa Bot's memory.")
 
-    names, emails = get_names_emails(FILENAME_NAMES_EMAILS)
+    names_file = FILENAME_DRY_RUN_NAMES_EMAILS if args.dry_run_send else FILENAME_NAMES_EMAILS
+    if args.dry_run_send:
+        print(f"\n*** DRY RUN SEND: emails go ONLY to the people in {names_file}, "
+              f"marked '{DRY_RUN_PREFIX}' ***\n")
+    try:
+        names, emails = get_names_emails(names_file)
+    except FileNotFoundError:
+        sys.exit(f"Couldn't find {names_file}. Run `python super_santa_bot.py --init` "
+                 f"to create it from its template, then edit it.")
     for name, email in zip(names, emails):
         print(f"{name}, {email}")
     if not confirm("these are your people?"):
-        sys.exit(f"Edit {FILENAME_NAMES_EMAILS} to fix Santa Bot's memory.")
+        sys.exit(f"Edit {names_file} to fix Santa Bot's memory.")
 
     couples = get_couples(FILENAME_COUPLES)
+    families = get_families(FILENAME_CHILDREN)
+    if args.dry_run_send:
+        couples, families = filter_to_names(names, couples, families)
+        print("\n(dry run list: only couples/families made up of people on it are used)")
     print("\ncouples:")
     for a, b in couples:
         print(f"  {a} & {b}")
     if not confirm("these are your couples?"):
         sys.exit(f"Edit {FILENAME_COUPLES} to fix Santa Bot's memory.")
 
-    families = get_families(FILENAME_CHILDREN)
     print("\nfamilies (parents can't get their children, or vice versa):")
     for parents, children in families:
         print(f"  {' & '.join(parents)} -> {', '.join(children)}")
@@ -356,19 +395,29 @@ def main():
     messages = []
     for giver, receiver, to_email in zip(names, receivers, emails):
         body = render_email(email_outline, giver, receiver, days, wishlists_link)
-        messages.append((to_email, build_message(host_email, to_email, email_title, body)))
+        subject = email_title
+        if args.dry_run_send:
+            subject, body = mark_dry_run(subject, body)
+        messages.append((to_email, build_message(host_email, to_email, subject, body)))
 
-    if args.dry_run:
+    if dry:
         print("\ndry run draw (shown ONLY because this is a dry run; a real run never prints this):")
         for giver, receiver in zip(names, receivers):
             print(f"  {giver} -> {receiver}")
         problems = check_assignment(names, receivers, couples, families)
         print("\nchecks:", "all passed ✅" if not problems else problems)
-        print(f"dry run: built {len(messages)} emails, sent none.")
-        return
+        if not args.dry_run_send:
+            print(f"dry run: built {len(messages)} emails, sent none.")
+            return
+        if not confirm(f"send {len(messages)} '{DRY_RUN_PREFIX.strip()}' emails to the dry run list?"):
+            sys.exit("Okay, nothing sent.")
 
     print("ssb just needs to make its merry way across the interwebs now...")
     sent, failed = send_all(host_email, password, messages)
+    if args.dry_run_send:
+        print(f"\nDry run send done: {len(sent)} sent"
+              + (f", {len(failed)} FAILED: {', '.join(failed)}" if failed else "") + ".")
+        sys.exit(1 if failed else 0)
     if failed:
         # Never print who-has-whom; just say who needs a manual follow-up.
         print(f"\nSent {len(sent)}, but {len(failed)} failed: {', '.join(failed)}")
