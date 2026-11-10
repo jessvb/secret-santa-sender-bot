@@ -43,7 +43,7 @@ python super_santa_bot.py --init "Family 1"
         - `${NUM_DAYS_UNTIL_CHRISTMAS}`: days left until Christmas (based on the date the email is sent)
         - `${WISHLISTS_LINK}`: the text from `wishlistslink.txt`
 3. Add some Christmas cheer ✨ (Note: this step is **NOT OPTIONAL**!)
-4. (Recommended) Take a practice lap! This checks everything, makes a draw, and prints who-gives-to-who so you can eyeball it (spoilers! 🙈), but sends nothing. A real run never prints the pairs. (`--dry-run` and `--dry-run-send` can't be combined; pick one!)
+4. (Recommended) Take a practice lap! This checks everything, makes a draw, and prints who-gives-to-who so you can eyeball it (spoilers! 🙈), but sends nothing. A real run never prints the pairs. `--dry-run` uses your *real* `names_emails.csv` (it's checking the real thing, and sends nothing). `--dry-run-send` is the one that uses `dry_run_names_emails.csv`. (They can't be combined; pick one!)
 ```
 python super_santa_bot.py "Family 1" --dry-run
 ```

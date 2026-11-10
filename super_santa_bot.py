@@ -430,8 +430,11 @@ def main():
     except FileNotFoundError:
         sys.exit(f"Couldn't find {names_file}. Copy it from "
                  f"{ADDITIONAL_FILES}/{TEMPLATES_DIR}/ and edit it.")
+    which = ("the DRY RUN list (test recipients)" if args.dry_run_send
+             else "the REAL list" + (" (nothing will be sent in a --dry-run)" if args.dry_run else ""))
+    print(f"people from {names_file}, {which}:")
     for name, email in zip(names, emails):
-        print(f"{name}, {email}")
+        print(f"  {name}, {email}")
     if not confirm("these are your people?"):
         sys.exit(f"Edit {names_file} to fix Santa Bot's memory.")
 
