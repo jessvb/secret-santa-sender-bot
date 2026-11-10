@@ -31,7 +31,7 @@ Mr. Claus, Mrs. Claus: Elf1, Elf2
     - `${NUM_DAYS_UNTIL_CHRISTMAS}`: days left until Christmas (based on the date the email is sent)
     - `${WISHLISTS_LINK}`: the text from `wishlistslink.txt`
 8. Add some Christmas cheer ✨ (Note: this step is **NOT OPTIONAL**!)
-9. (Recommended) Take a practice lap! This checks everything and makes a draw, but sends nothing and never reveals who got who:
+9. (Recommended) Take a practice lap! This checks everything, makes a draw, and prints who-gives-to-who so you can eyeball it (spoilers! 🙈), but sends nothing. A real run never prints the pairs:
 ```
 python super_santa_bot.py --dry-run
 ```

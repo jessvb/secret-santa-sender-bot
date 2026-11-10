@@ -303,7 +303,7 @@ def main():
                         help="create your real config files from the templates")
     parser.add_argument("--dry-run", action="store_true",
                         help="check inputs and make a valid draw, but send nothing "
-                             "(assignments are never printed)")
+                             "(prints the draw so you can eyeball it; real runs never do)")
     args = parser.parse_args()
     if args.init:
         init_files()
@@ -359,6 +359,11 @@ def main():
         messages.append((to_email, build_message(host_email, to_email, email_title, body)))
 
     if args.dry_run:
+        print("\ndry run draw (shown ONLY because this is a dry run; a real run never prints this):")
+        for giver, receiver in zip(names, receivers):
+            print(f"  {giver} -> {receiver}")
+        problems = check_assignment(names, receivers, couples, families)
+        print("\nchecks:", "all passed ✅" if not problems else problems)
         print(f"dry run: built {len(messages)} emails, sent none.")
         return
 
