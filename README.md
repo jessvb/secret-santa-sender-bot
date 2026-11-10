@@ -5,30 +5,25 @@ Send anonymous emails 📧 to gift exchange participants 🤩 with the Secret Sa
 The Secret Santa Bot takes a list of names and emails of gift-givers, automatically  decides who will be giving gifts to who, and sends them each emails with the name of their 🎁 Secret Gift Recipients 🎁! You can also give Santa Bot a list of couples 💑, so that the couples don't get each other (couples give gifts to each other anyways—let them enjoy giving to others 😉)
 
 ## how it works: hacker-level
-1. Edit `email.html` with your personalized message to the gift-givers. You can use the following variables to refer to the people involved in the exchange, and other things:
-    - `${GIVE_NAME}`: the name of the gift-giver (i.e., the name of the person receiving the email)
-    - `${REC_NAME}`: the name of the person receiving the gift (i.e., the person who the email-receiver is *buying for*)
-    - `${NUM_DAYS_UNTIL_CHRISTMAS}`: the number of days left until Christmas (based on the date the email is sent)
-    - `${WISHLISTS_LINK}`: whatever text that you enter into the `wishlistslink.txt` file (you may want to put a link to a page with everyone's wishlists here, but it can really be anything!)
-2. Copy the `names_emails.template.csv` file and rename it `names_emails.csv`:
+1. Create your real config files from the templates (existing files are never overwritten):
 ```
-cp additional_files/names_emails.template.csv additional_files/names_emails.csv
+python super_santa_bot.py --init
 ```
-3. Edit the `names_emails.csv` file with the names (column 1) and corresponding email addresses (column 2) of the gift-givers
-
-4. (Optional) Add a list of couples to `couples.txt` in the format:
+   Every file below lives in `additional_files/`. The `*.template.*` files are tracked in git; the real copies are in `.gitignore`, so your friends' emails and your password never get committed. In the text/CSV files, lines starting with `#` are comments.
+2. `names_emails.csv`: names (column 1) and email addresses (column 2) of the gift-givers, one per line. Names must be unique.
+3. `couples.txt` (optional): pairs who shouldn't get each other, in the format below (delete the examples if you have no couples):
 ```
 Mary, Joseph
 Mr. Claus, Mrs. Claus
 ```
-5. (Optional) Add a link to a webpage that contains everyone's wishlists in `wishlistslink.txt`
-6. Copy the `host_email_auth.template.txt` file and rename it `host_email_auth.txt`:
-```
-cp additional_files/host_email_auth.template.txt additional_files/host_email_auth.txt
-```
-7. Edit the `host_email_auth.txt` file with your credentials (email address you want the emails to be sent from on the first line, and password to that email on the next line)
-    - Note: make sure your host email server allows less secure applications— Otherwise, you might get an error message like this, `smtplib.SMTPAuthenticationError: (535, b'5.7.8 Username and Password not accepted. Learn more at\n5.7.8`
-    - For Gmail accounts, you need to [add 2-step verification](https://myaccount.google.com/signinoptions/two-step-verification), create an [app password for the Santa Bot](https://myaccount.google.com/apppasswords), and enter this app password into host_email_auth.txt instead of your account password
+4. `wishlistslink.txt`: a link to a page with everyone's wishlists (it can really be anything!), and `emailtitle.txt`: the email subject line.
+5. `host_email_auth.txt`: the email address you want the emails sent from on the first line, and its password on the second
+    - For Gmail accounts, you need to [add 2-step verification](https://myaccount.google.com/signinoptions/two-step-verification), create an [app password for the Santa Bot](https://myaccount.google.com/apppasswords), and enter this app password instead of your account password. Otherwise you'll get `smtplib.SMTPAuthenticationError: (535, ...Username and Password not accepted`.
+6. `email.html`: your personalized message. You can use these variables:
+    - `${GIVE_NAME}`: the name of the gift-giver (i.e., the person receiving the email)
+    - `${REC_NAME}`: the name of the person they are *buying for*
+    - `${NUM_DAYS_UNTIL_CHRISTMAS}`: days left until Christmas (based on the date the email is sent)
+    - `${WISHLISTS_LINK}`: the text from `wishlistslink.txt`
 7. Add some Christmas cheer ✨ (Note: this step is **NOT OPTIONAL**!)
 8. Let the Super Santa Bot do it's thing! In the root directory:
 ```

@@ -1,0 +1,3 @@
+# The link that replaces ${WISHLISTS_LINK} in the email (anything works, not just URLs).
+# Only the first non-comment line is used.
+https://example.com/our-wishlists

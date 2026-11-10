@@ -5,16 +5,18 @@
 import argparse
 import csv
 import html
+import os
 import random
 import re
 import smtplib
+import shutil
 import ssl
 import sys
 from datetime import date
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-FILENAME_EMAIL_OUTLINE = "email.html"
+FILENAME_EMAIL_OUTLINE = "additional_files/email.html"
 FILENAME_NAMES_EMAILS = "additional_files/names_emails.csv"
 FILENAME_HOST_EMAIL_AUTH = "additional_files/host_email_auth.txt"
 FILENAME_COUPLES = "additional_files/couples.txt"
@@ -28,24 +30,44 @@ SMTP_TIMEOUT_SECONDS = 30
 
 # ---------------------------------------------------------------- file input
 
-def read_first_line(filename):
+def read_data_lines(filename):
+    """Non-blank lines of a config file, ignoring '#' comment lines. `utf-8-sig`
+    transparently drops the BOM that Excel/Sheets put at the start of CSVs
+    (the old code chopped the first letter off of the first name instead)."""
     with open(filename, encoding="utf-8-sig") as f:
-        return f.readline().strip()
+        lines = [ln.strip() for ln in f]
+    return [ln for ln in lines if ln and not ln.startswith("#")]
+
+
+def read_first_line(filename):
+    lines = read_data_lines(filename)
+    if not lines:
+        raise ValueError(f"{filename} is empty (only comments/blank lines)")
+    return lines[0]
+
+
+def init_files():
+    """Copy each `x.template.y` to `x.y` unless `x.y` already exists."""
+    for name in sorted(os.listdir("additional_files")):
+        real = name.replace(".template", "")
+        if real == name:
+            continue
+        src, dst = os.path.join("additional_files", name), os.path.join("additional_files", real)
+        if os.path.exists(dst):
+            print(f"  kept existing {dst}")
+        else:
+            shutil.copyfile(src, dst)
+            print(f"  created {dst}  <- now edit it")
 
 
 def get_names_emails(filename):
-    """Read `name,email` rows. `utf-8-sig` transparently drops the BOM that
-    Excel/Sheets put at the start of CSVs (the old code chopped the first
-    letter off of the first name instead)."""
+    """Read `name,email` rows."""
     names, emails = [], []
-    with open(filename, encoding="utf-8-sig", newline="") as f:
-        for row in csv.reader(f):
-            if not row or not "".join(row).strip():
-                continue  # skip blank lines
-            if len(row) < 2 or not row[0].strip() or not row[1].strip():
-                raise ValueError(f"{filename}: expected 'name,email', got {row!r}")
-            names.append(row[0].strip())
-            emails.append(row[1].strip())
+    for row in csv.reader(read_data_lines(filename)):
+        if len(row) < 2 or not row[0].strip() or not row[1].strip():
+            raise ValueError(f"{filename}: expected 'name,email', got {row!r}")
+        names.append(row[0].strip())
+        emails.append(row[1].strip())
     return names, emails
 
 
@@ -53,16 +75,13 @@ def get_couples(filename):
     """Read `name1,name2` rows. A missing file just means 'no couples'."""
     couples = []
     try:
-        f = open(filename, encoding="utf-8-sig", newline="")
+        lines = read_data_lines(filename)
     except FileNotFoundError:
         return couples
-    with f:
-        for row in csv.reader(f):
-            if not row or not "".join(row).strip():
-                continue
-            if len(row) != 2:
-                raise ValueError(f"{filename}: expected 'name1,name2', got {row!r}")
-            couples.append((row[0].strip(), row[1].strip()))
+    for row in csv.reader(lines):
+        if len(row) != 2:
+            raise ValueError(f"{filename}: expected 'name1,name2', got {row!r}")
+        couples.append((row[0].strip(), row[1].strip()))
     return couples
 
 
@@ -232,10 +251,15 @@ def confirm(question):
 
 def main():
     parser = argparse.ArgumentParser(description="Secret Santa Bot")
+    parser.add_argument("--init", action="store_true",
+                        help="create your real config files from the templates")
     parser.add_argument("--dry-run", action="store_true",
                         help="check inputs and make a valid draw, but send nothing "
                              "(assignments are never printed)")
     args = parser.parse_args()
+    if args.init:
+        init_files()
+        return
 
     days = days_until_christmas()
     print(f"Only {days} days until Christmas!!!\n")

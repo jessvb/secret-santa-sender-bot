@@ -1,2 +1,2 @@
-email@gmail.com
-password1234
+your.email@gmail.com
+your-16-character-app-password

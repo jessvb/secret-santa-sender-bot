@@ -107,6 +107,10 @@ venv.bak/
 .DS_Store
 
 ### Don't push emails and passwords to github!
-names_emails.csv
-couples.txt
-host_email_auth.txt
+### Only the *.template.* files are tracked; --init copies them to these.
+additional_files/names_emails.csv
+additional_files/couples.txt
+additional_files/host_email_auth.txt
+additional_files/wishlistslink.txt
+additional_files/emailtitle.txt
+additional_files/email.html

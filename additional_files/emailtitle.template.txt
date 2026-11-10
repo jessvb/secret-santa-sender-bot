@@ -1,0 +1,2 @@
+# The email subject line. Only the first non-comment line is used.
+Your Secret Santa assignment is here! 🎅

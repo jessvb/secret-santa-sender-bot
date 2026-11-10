@@ -1,7 +1,10 @@
-﻿Mary,mary@christmasmom.com
-Joseph,joseph@bethlehem.com
-Rudolf,red-nose@northpole.com
-Dasher,super-speedy@santaforever.com
-Blitzen,even-speedier@northpole.com
-Mr. Claus,santa@northpole.com
-Mrs. Claus,susan@northpole.com
+# Names and email addresses of everyone in the exchange, one person per line:
+#   name,email
+# Lines starting with # and blank lines are ignored. Names must be unique.
+Mary,mary@example.com
+Joseph,joseph@example.com
+Rudolf,rudolf@example.com
+Dasher,dasher@example.com
+Blitzen,blitzen@example.com
+Mr. Claus,mr.claus@example.com
+Mrs. Claus,mrs.claus@example.com

@@ -1,3 +1,11 @@
+<!--
+  Email body template. Variables replaced for each person:
+    ${GIVE_NAME}                  the person receiving this email
+    ${REC_NAME}                   who they are buying a gift for
+    ${NUM_DAYS_UNTIL_CHRISTMAS}   days left until Dec 25
+    ${WISHLISTS_LINK}             text from wishlistslink.txt
+  This comment is sent along with the email but is invisible to readers.
+-->
 MERRY CHRISTMAS, ${GIVE_NAME}!
 <br>
 <br>My name is Buddy. What’s your favourite colour? 
@@ -20,7 +28,7 @@ MERRY CHRISTMAS, ${GIVE_NAME}!
 <br>
 <br>YAAAAAY! They’re amazing! I’m so excited! 
 <br>
-<br>You get to give them the best gift! Don't forget to update your wishlist on <a href="https://todo-insert-link.com">our spreadsheet</a>!
+<br>You get to give them the best gift! Don't forget to update your wishlist on <a href="${WISHLISTS_LINK}">our spreadsheet</a>!
 <br>
 <br>And now, for the important stuff:
 <br>

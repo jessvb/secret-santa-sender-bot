@@ -1,2 +1,5 @@
+# Couples who should NOT be matched with each other, one couple per line:
+#   name1,name2
+# Names must match names_emails.csv. Delete the examples below if you have no couples.
 Mary,Joseph
 Mr. Claus,Mrs. Claus
