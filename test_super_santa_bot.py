@@ -1,8 +1,9 @@
 import random
 import unittest
 
-from super_santa_bot import (check_assignment, days_until_christmas, is_couple,
-                             make_the_magic, render_email, validate_inputs)
+from super_santa_bot import (check_assignment, days_until_christmas, get_families,
+                             is_couple, is_parent_child, make_the_magic,
+                             render_email, validate_inputs)
 from datetime import date
 
 NAMES = ["Mary", "Joseph", "Rudolf", "Dasher", "Blitzen", "Mr. Claus", "Mrs. Claus"]
@@ -12,7 +13,7 @@ COUPLES = [("Mary", "Joseph"), ("Mr. Claus", "Mrs. Claus")]
 class Matching(unittest.TestCase):
     def test_many_random_draws_are_valid(self):
         for seed in range(2000):
-            r = make_the_magic(NAMES, COUPLES, random.Random(seed))
+            r = make_the_magic(NAMES, COUPLES, rng=random.Random(seed))
             self.assertEqual(check_assignment(NAMES, r, COUPLES), [], seed)
 
     def test_tight_case_that_hung_the_old_algorithm(self):
@@ -20,7 +21,7 @@ class Matching(unittest.TestCase):
         names = ["a", "b", "c", "d"]
         couples = [("a", "b"), ("c", "d")]
         for seed in range(500):
-            r = make_the_magic(names, couples, random.Random(seed))
+            r = make_the_magic(names, couples, rng=random.Random(seed))
             self.assertEqual(check_assignment(names, r, couples), [])
 
     def test_two_people_swap(self):
@@ -39,6 +40,59 @@ class Matching(unittest.TestCase):
         self.assertTrue(check_assignment(["a", "b"], ["a", "b"], []))      # self
         self.assertTrue(check_assignment(["a", "b", "c"], ["b", "b", "a"], []))  # dup
         self.assertTrue(check_assignment(["a", "b", "c"], ["b", "a", "c"], []))  # self c
+
+
+KIDS = ["James", "Jude", "Jesus", "Elf1", "Elf2"]
+FAMILIES = [(["Mary", "Joseph"], ["James", "Jude", "Jesus"]),
+            (["Mr. Claus", "Mrs. Claus"], ["Elf1", "Elf2"])]
+EVERYONE = NAMES + KIDS
+
+
+class Families(unittest.TestCase):
+    def test_parents_never_get_children_or_vice_versa(self):
+        for seed in range(2000):
+            r = make_the_magic(EVERYONE, COUPLES, FAMILIES, rng=random.Random(seed))
+            self.assertEqual(check_assignment(EVERYONE, r, COUPLES, FAMILIES), [], seed)
+            for g, rec in zip(EVERYONE, r):
+                self.assertFalse(is_parent_child(g, rec, FAMILIES))
+
+    def test_siblings_may_get_each_other(self):
+        seen = any(
+            (g in KIDS[:3] and rec in KIDS[:3])
+            for seed in range(200)
+            for g, rec in zip(EVERYONE, make_the_magic(
+                EVERYONE, COUPLES, FAMILIES, rng=random.Random(seed))))
+        self.assertTrue(seen)
+
+    def test_single_parent_and_impossible(self):
+        n, f = ["p", "c", "x", "y"], [(["p"], ["c"])]
+        r = make_the_magic(n, [], f)
+        self.assertEqual(check_assignment(n, r, [], f), [])
+        # parent+child only: nobody can give to anyone else
+        with self.assertRaises(ValueError):
+            make_the_magic(["p", "c"], [], [(["p"], ["c"])])
+
+    def test_checker_flags_parent_child(self):
+        self.assertTrue(check_assignment(["p", "c", "x"], ["c", "x", "p"], [],
+                                         [(["p"], ["c"])]))
+
+    def test_validation(self):
+        emails = [f"{n}@x.com" for n in "pcx"]
+        with self.assertRaises(ValueError):
+            validate_inputs(list("pcx"), emails, [], [(["p"], ["ghost"])])
+        with self.assertRaises(ValueError):
+            validate_inputs(list("pcx"), emails, [], [(["p"], ["p"])])
+
+    def test_parse(self):
+        import os, tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("# c\nMary, Joseph: James, Jude\nSolo: Kid\n")
+        try:
+            self.assertEqual(get_families(f.name),
+                             [(["Mary", "Joseph"], ["James", "Jude"]), (["Solo"], ["Kid"])])
+        finally:
+            os.unlink(f.name)
+        self.assertEqual(get_families("/nonexistent.txt"), [])
 
 
 class Validation(unittest.TestCase):

@@ -20,6 +20,7 @@ FILENAME_EMAIL_OUTLINE = "additional_files/email.html"
 FILENAME_NAMES_EMAILS = "additional_files/names_emails.csv"
 FILENAME_HOST_EMAIL_AUTH = "additional_files/host_email_auth.txt"
 FILENAME_COUPLES = "additional_files/couples.txt"
+FILENAME_CHILDREN = "additional_files/children.txt"
 FILENAME_WISHLISTS = "additional_files/wishlistslink.txt"
 FILENAME_EMAIL_TITLE = "additional_files/emailtitle.txt"
 
@@ -85,6 +86,27 @@ def get_couples(filename):
     return couples
 
 
+def get_families(filename):
+    """Read `parent1, parent2: child1, child2, ...` rows (one family per line;
+    one or more parents). Returns [(parents, children), ...]. A missing file
+    just means 'no families'."""
+    families = []
+    try:
+        lines = read_data_lines(filename)
+    except FileNotFoundError:
+        return families
+    for line in lines:
+        if line.count(":") != 1:
+            raise ValueError(f"{filename}: expected 'parent1, parent2: child1, child2', got {line!r}")
+        left, right = line.split(":")
+        parents = [n.strip() for n in left.split(",") if n.strip()]
+        children = [n.strip() for n in right.split(",") if n.strip()]
+        if not parents or not children:
+            raise ValueError(f"{filename}: need at least one parent and one child, got {line!r}")
+        families.append((parents, children))
+    return families
+
+
 def get_host_email_password(filename):
     with open(filename, encoding="utf-8-sig") as f:
         lines = f.read().splitlines()
@@ -93,7 +115,7 @@ def get_host_email_password(filename):
     return lines[0].strip(), lines[1].strip()
 
 
-def validate_inputs(names, emails, couples):
+def validate_inputs(names, emails, couples, families=()):
     """Catch input mistakes that would silently produce wrong pairings."""
     if len(names) < 2:
         raise ValueError("need at least 2 participants")
@@ -114,6 +136,13 @@ def validate_inputs(names, emails, couples):
                 raise ValueError(f"couples file mentions {n!r}, who isn't in the names list")
         if a.lower() == b.lower():
             raise ValueError(f"couple pairs {a!r} with themself")
+    for parents, children in families:
+        for n in parents + children:
+            if n.lower() not in known:
+                raise ValueError(f"children file mentions {n!r}, who isn't in the names list")
+        overlap = {p.lower() for p in parents} & {c.lower() for c in children}
+        if overlap:
+            raise ValueError(f"{sorted(overlap)} listed as both parent and child in the same family")
 
 
 # ------------------------------------------------------------------ matching
@@ -123,7 +152,24 @@ def is_couple(name1, name2, couples):
     return any(pair == {a.strip().lower(), b.strip().lower()} for a, b in couples)
 
 
-def check_assignment(givers, receivers, couples):
+def is_parent_child(name1, name2, families):
+    """True if one is a parent of the other (siblings are fine!)."""
+    a, b = name1.strip().lower(), name2.strip().lower()
+    for parents, children in families:
+        ps = {p.strip().lower() for p in parents}
+        cs = {c.strip().lower() for c in children}
+        if (a in ps and b in cs) or (b in ps and a in cs):
+            return True
+    return False
+
+
+def is_forbidden(name1, name2, couples, families=()):
+    return (name1.strip().lower() == name2.strip().lower()
+            or is_couple(name1, name2, couples)
+            or is_parent_child(name1, name2, families))
+
+
+def check_assignment(givers, receivers, couples, families=()):
     """Independently verify a result. Returns a list of problems (empty = ok)."""
     problems = []
     if sorted(givers) != sorted(receivers):
@@ -134,10 +180,12 @@ def check_assignment(givers, receivers, couples):
             problems.append(f"{giver} has themself")
         elif is_couple(giver, receiver, couples):
             problems.append(f"{giver} has their partner {receiver}")
+        elif is_parent_child(giver, receiver, families):
+            problems.append(f"{giver} has their parent/child {receiver}")
     return problems
 
 
-def make_the_magic(names, couples, rng=random):
+def make_the_magic(names, couples, families=(), rng=random):
     """Return receivers such that names[i] gives a gift to receivers[i].
 
     Randomized backtracking: for each giver we try the allowed receivers in
@@ -150,7 +198,7 @@ def make_the_magic(names, couples, rng=random):
     rng.shuffle(order)  # the order we hand out receivers in
     allowed = [
         [j for j in range(n)
-         if j != i and not is_couple(names[i], names[j], couples)]
+         if j != i and not is_forbidden(names[i], names[j], couples, families)]
         for i in range(n)
     ]
     # fewest-options-first makes dead ends show up early
@@ -175,9 +223,9 @@ def make_the_magic(names, couples, rng=random):
 
     if not assign(0):
         raise ValueError("no valid Secret Santa assignment exists with these "
-                         "names and couples")
+                         "names, couples and children")
     receivers = [names[j] for j in chosen]
-    problems = check_assignment(names, receivers, couples)
+    problems = check_assignment(names, receivers, couples, families)
     assert not problems, problems  # should be impossible; never send bad data
     return receivers
 
@@ -285,9 +333,16 @@ def main():
     if not confirm("these are your couples?"):
         sys.exit(f"Edit {FILENAME_COUPLES} to fix Santa Bot's memory.")
 
+    families = get_families(FILENAME_CHILDREN)
+    print("\nfamilies (parents can't get their children, or vice versa):")
+    for parents, children in families:
+        print(f"  {' & '.join(parents)} -> {', '.join(children)}")
+    if not confirm("these are your families?"):
+        sys.exit(f"Edit {FILENAME_CHILDREN} to fix Santa Bot's memory.")
+
     try:
-        validate_inputs(names, emails, couples)
-        receivers = make_the_magic(names, couples)
+        validate_inputs(names, emails, couples, families)
+        receivers = make_the_magic(names, couples, families)
     except ValueError as e:
         sys.exit(f"Oh no! {e}")
     print("ssb made the magic! everyone's paired up :)")

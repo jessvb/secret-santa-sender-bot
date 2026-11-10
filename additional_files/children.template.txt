@@ -1,0 +1,7 @@
+# Families whose parents and children shouldn't get each other (in either direction),
+# one family per line:
+#   parent1, parent2: child1, child2, child3
+# Everyone must be in names_emails.csv. A single parent is fine (just one name before
+# the colon). Siblings CAN get each other. Delete the examples if nobody has kids.
+Mary, Joseph: James, Jude, Jesus
+Mr. Claus, Mrs. Claus: Elf1, Elf2
