@@ -3,7 +3,7 @@ import random
 import tempfile
 import unittest
 
-from super_santa_bot import (choose_group, find_host_auth_file, init_group, list_groups,
+from super_santa_bot import (choose_group, find_email_outline, find_host_auth_file, init_group, list_groups,
                              check_assignment, days_until_christmas, get_families,
                              filter_to_names, is_couple, is_parent_child, mark_dry_run, make_the_magic,
                              render_email, validate_inputs)
@@ -136,6 +136,19 @@ class Groups(unittest.TestCase):
             fh.write("my real data")
         init_group("friends", self.base)  # again
         self.assertEqual(open(path).read(), "my real data")
+
+    def test_email_falls_back_to_template(self):
+        init_group("g", self.base)
+        gdir = os.path.join(self.base, "g")
+        self.assertFalse(os.path.exists(os.path.join(gdir, "email.html")))  # not copied
+        path, fallback = find_email_outline(gdir, self.base)
+        self.assertTrue(fallback)
+        self.assertEqual(path, os.path.join(self.base, "templates", "email.html"))
+        with open(os.path.join(gdir, "email.html"), "w") as fh:
+            fh.write("mine")
+        path, fallback = find_email_outline(gdir, self.base)
+        self.assertFalse(fallback)
+        self.assertEqual(path, os.path.join(gdir, "email.html"))
 
     def test_shared_login_is_used_and_not_copied(self):
         with open(os.path.join(self.base, "host_email_auth.txt"), "w") as fh:

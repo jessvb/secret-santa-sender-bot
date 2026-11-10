@@ -77,6 +77,8 @@ def init_group(name, base=ADDITIONAL_FILES):
     os.makedirs(dst_dir, exist_ok=True)
     for fname in sorted(os.listdir(src_dir)):
         dst = os.path.join(dst_dir, fname)
+        if fname == F_EMAIL_OUTLINE:
+            continue  # optional per group: without one, the template's is used
         if fname == F_HOST_EMAIL_AUTH and os.path.exists(os.path.join(base, F_HOST_EMAIL_AUTH)):
             print(f"  (skipped {fname}: using the shared {base}/{F_HOST_EMAIL_AUTH})")
         elif os.path.exists(dst):
@@ -110,6 +112,15 @@ def choose_group(requested=None, base=ADDITIONAL_FILES):
         if answer.isdigit() and 1 <= int(answer) <= len(groups):
             return groups[int(answer) - 1]
         print("  (not one of the groups, try again)")
+
+
+def find_email_outline(group_dir, base=ADDITIONAL_FILES):
+    """The group's own email.html if it has one, else the template's.
+    Returns (path, is_template_fallback)."""
+    own = os.path.join(group_dir, F_EMAIL_OUTLINE)
+    if os.path.exists(own):
+        return own, False
+    return os.path.join(base, TEMPLATES_DIR, F_EMAIL_OUTLINE), True
 
 
 def find_host_auth_file(group_dir, base=ADDITIONAL_FILES):
@@ -421,6 +432,12 @@ def main():
     if not confirm(f'this is the email title "{email_title}"?'):
         sys.exit(f"Edit {path(F_EMAIL_TITLE)} to fix Santa Bot's memory.")
 
+    email_path, is_fallback = find_email_outline(gdir)
+    if is_fallback:
+        print(f"\n({gdir}/ has no {F_EMAIL_OUTLINE}, so the template one is used)")
+    if not confirm(f"is this your email? {os.path.abspath(email_path)}"):
+        sys.exit(f"Edit that file, or put your own {F_EMAIL_OUTLINE} in {gdir}/ to use instead.")
+
     names_file = path(F_DRY_RUN_NAMES_EMAILS if args.dry_run_send else F_NAMES_EMAILS)
     if args.dry_run_send:
         print(f"\n*** DRY RUN SEND: emails go ONLY to the people in {names_file}, "
@@ -469,7 +486,7 @@ def main():
             host_email, password = get_host_email_password(find_host_auth_file(gdir))
         except (FileNotFoundError, ValueError) as e:
             sys.exit(f"Oh no! {e}")
-    with open(path(F_EMAIL_OUTLINE), encoding="utf-8") as f:
+    with open(email_path, encoding="utf-8") as f:
         email_outline = f.read()
     messages = []
     for giver, receiver, to_email in zip(names, receivers, emails):
