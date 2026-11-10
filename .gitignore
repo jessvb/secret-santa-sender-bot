@@ -107,12 +107,12 @@ venv.bak/
 .DS_Store
 
 ### Don't push emails and passwords to github!
-### Only the *.template.* files are tracked; --init copies them to these.
-### (email.html is deliberately committed: it's our record of each year's email.)
-additional_files/names_emails.csv
-additional_files/dry_run_names_emails.csv
-additional_files/couples.txt
-additional_files/children.txt
-additional_files/host_email_auth.txt
-additional_files/wishlistslink.txt
-additional_files/emailtitle.txt
+### additional_files/templates/ is tracked (examples). Every other folder in
+### additional_files/ is a real Secret Santa group and is ignored, EXCEPT its
+### email.html, which is committed on purpose as our record of each year's email.
+### (Loose files in additional_files/, e.g. a shared host_email_auth.txt, are ignored too.)
+additional_files/*
+!additional_files/*/
+additional_files/*/*
+!additional_files/templates/*
+!additional_files/*/email.html

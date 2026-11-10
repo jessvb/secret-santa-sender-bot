@@ -1,7 +1,10 @@
+import os
 import random
+import tempfile
 import unittest
 
-from super_santa_bot import (check_assignment, days_until_christmas, get_families,
+from super_santa_bot import (choose_group, find_host_auth_file, init_group, list_groups,
+                             check_assignment, days_until_christmas, get_families,
                              filter_to_names, is_couple, is_parent_child, mark_dry_run, make_the_magic,
                              render_email, validate_inputs)
 from datetime import date
@@ -109,6 +112,57 @@ class DryRunSend(unittest.TestCase):
         c, f = filter_to_names(["Mary", "Joseph", "Zed"], COUPLES, FAMILIES)
         self.assertEqual(c, [("Mary", "Joseph")])
         self.assertEqual(f, [])  # no kids on the list -> family dropped
+
+
+class Groups(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.base = os.path.join(self.tmp.name, "additional_files")
+        os.makedirs(os.path.join(self.base, "templates"))
+        for f in ("names_emails.csv", "host_email_auth.txt", "email.html"):
+            with open(os.path.join(self.base, "templates", f), "w") as fh:
+                fh.write("template " + f)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_init_list_and_never_overwrite(self):
+        self.assertEqual(list_groups(self.base), [])
+        init_group("family 1", self.base)
+        init_group("friends", self.base)
+        self.assertEqual(list_groups(self.base), ["family 1", "friends"])  # not 'templates'
+        path = os.path.join(self.base, "friends", "names_emails.csv")
+        with open(path, "w") as fh:
+            fh.write("my real data")
+        init_group("friends", self.base)  # again
+        self.assertEqual(open(path).read(), "my real data")
+
+    def test_shared_login_is_used_and_not_copied(self):
+        with open(os.path.join(self.base, "host_email_auth.txt"), "w") as fh:
+            fh.write("shared")
+        init_group("g", self.base)
+        self.assertFalse(os.path.exists(os.path.join(self.base, "g", "host_email_auth.txt")))
+        self.assertEqual(find_host_auth_file(os.path.join(self.base, "g"), self.base),
+                         os.path.join(self.base, "host_email_auth.txt"))
+        # a group's own login wins
+        with open(os.path.join(self.base, "g", "host_email_auth.txt"), "w") as fh:
+            fh.write("own")
+        self.assertEqual(find_host_auth_file(os.path.join(self.base, "g"), self.base),
+                         os.path.join(self.base, "g", "host_email_auth.txt"))
+
+    def test_bad_names_rejected(self):
+        for bad in ("templates", "..", "a/b", ""):
+            with self.assertRaises(ValueError):
+                init_group(bad, self.base)
+
+    def test_choose(self):
+        with self.assertRaises(ValueError):
+            choose_group(None, self.base)          # none yet
+        init_group("only", self.base)
+        self.assertEqual(choose_group(None, self.base), "only")   # single group: automatic
+        self.assertEqual(choose_group("only", self.base), "only")
+        with self.assertRaises(ValueError):
+            choose_group("typo", self.base)
 
 
 class Validation(unittest.TestCase):

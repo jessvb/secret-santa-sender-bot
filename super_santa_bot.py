@@ -9,6 +9,7 @@ import os
 import random
 import re
 import smtplib
+import shlex
 import shutil
 import ssl
 import sys
@@ -16,15 +17,23 @@ from datetime import date
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-FILENAME_EMAIL_OUTLINE = "additional_files/email.html"
-FILENAME_NAMES_EMAILS = "additional_files/names_emails.csv"
-FILENAME_DRY_RUN_NAMES_EMAILS = "additional_files/dry_run_names_emails.csv"
+# Layout:  additional_files/templates/   <- tracked example files
+#          additional_files/<group>/     <- one folder per Secret Santa group (gitignored,
+#                                           except its email.html)
+#          additional_files/host_email_auth.txt  <- optional login shared by all groups
+ADDITIONAL_FILES = "additional_files"
+TEMPLATES_DIR = "templates"
 DRY_RUN_PREFIX = "DRY RUN: "
-FILENAME_HOST_EMAIL_AUTH = "additional_files/host_email_auth.txt"
-FILENAME_COUPLES = "additional_files/couples.txt"
-FILENAME_CHILDREN = "additional_files/children.txt"
-FILENAME_WISHLISTS = "additional_files/wishlistslink.txt"
-FILENAME_EMAIL_TITLE = "additional_files/emailtitle.txt"
+
+# file names inside a group folder
+F_EMAIL_OUTLINE = "email.html"
+F_NAMES_EMAILS = "names_emails.csv"
+F_DRY_RUN_NAMES_EMAILS = "dry_run_names_emails.csv"
+F_HOST_EMAIL_AUTH = "host_email_auth.txt"
+F_COUPLES = "couples.txt"
+F_CHILDREN = "children.txt"
+F_WISHLISTS = "wishlistslink.txt"
+F_EMAIL_TITLE = "emailtitle.txt"
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -49,18 +58,66 @@ def read_first_line(filename):
     return lines[0]
 
 
-def init_files():
-    """Copy each `x.template.y` to `x.y` unless `x.y` already exists."""
-    for name in sorted(os.listdir("additional_files")):
-        real = name.replace(".template", "")
-        if real == name:
-            continue
-        src, dst = os.path.join("additional_files", name), os.path.join("additional_files", real)
-        if os.path.exists(dst):
+def list_groups(base=ADDITIONAL_FILES):
+    """Names of the group folders (everything in additional_files/ but templates)."""
+    if not os.path.isdir(base):
+        return []
+    return sorted(d for d in os.listdir(base)
+                  if d != TEMPLATES_DIR and not d.startswith(".")
+                  and os.path.isdir(os.path.join(base, d)))
+
+
+def init_group(name, base=ADDITIONAL_FILES):
+    """Create base/<name>/ from base/templates/. Never overwrites existing files.
+    The login file is skipped if a shared base/host_email_auth.txt exists."""
+    if not re.fullmatch(r"[\w .-]+", name) or name in (TEMPLATES_DIR, ".", ".."):
+        raise ValueError(f"{name!r} isn't a usable group name (letters, digits, space, - _ . only; "
+                         f"and not {TEMPLATES_DIR!r})")
+    src_dir, dst_dir = os.path.join(base, TEMPLATES_DIR), os.path.join(base, name)
+    os.makedirs(dst_dir, exist_ok=True)
+    for fname in sorted(os.listdir(src_dir)):
+        dst = os.path.join(dst_dir, fname)
+        if fname == F_HOST_EMAIL_AUTH and os.path.exists(os.path.join(base, F_HOST_EMAIL_AUTH)):
+            print(f"  (skipped {fname}: using the shared {base}/{F_HOST_EMAIL_AUTH})")
+        elif os.path.exists(dst):
             print(f"  kept existing {dst}")
         else:
-            shutil.copyfile(src, dst)
+            shutil.copyfile(os.path.join(src_dir, fname), dst)
             print(f"  created {dst}  <- now edit it")
+
+
+def choose_group(requested=None, base=ADDITIONAL_FILES):
+    """Pick the group folder: the one named on the command line, the only one
+    there is, or one the user picks from a numbered list."""
+    groups = list_groups(base)
+    if requested:
+        if requested not in groups:
+            raise ValueError(f"no group folder {base}/{requested}/ (existing groups: "
+                             f"{', '.join(groups) or 'none'}). Make one with "
+                             f"`python super_santa_bot.py --init {shlex.quote(requested)}`")
+        return requested
+    if not groups:
+        raise ValueError(f"no groups yet! Make one with `python super_santa_bot.py --init my-group`")
+    if len(groups) == 1:
+        return groups[0]
+    print("Which Secret Santa group?")
+    for i, g in enumerate(groups, 1):
+        print(f"  {i}. {g}")
+    while True:
+        answer = input("number or name: ").strip()
+        if answer in groups:
+            return answer
+        if answer.isdigit() and 1 <= int(answer) <= len(groups):
+            return groups[int(answer) - 1]
+        print("  (not one of the groups, try again)")
+
+
+def find_host_auth_file(group_dir, base=ADDITIONAL_FILES):
+    """The group's own login file wins; otherwise the shared one."""
+    for path in (os.path.join(group_dir, F_HOST_EMAIL_AUTH), os.path.join(base, F_HOST_EMAIL_AUTH)):
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(f"no {F_HOST_EMAIL_AUTH} in {group_dir}/ or {base}/")
 
 
 def get_names_emails(filename):
@@ -322,48 +379,64 @@ def confirm(question):
 
 def main():
     parser = argparse.ArgumentParser(description="Secret Santa Bot")
-    parser.add_argument("--init", action="store_true",
-                        help="create your real config files from the templates")
+    parser.add_argument("group", nargs="?",
+                        help=f"which group folder in {ADDITIONAL_FILES}/ to use "
+                             "(asks you if there are several and you don't say)")
+    parser.add_argument("--init", metavar="GROUP",
+                        help=f"create a new group folder {ADDITIONAL_FILES}/GROUP/ from the templates")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true",
                       help="check inputs and make a valid draw, but send nothing "
                            "(prints the draw so you can eyeball it; real runs never do)")
     mode.add_argument("--dry-run-send", action="store_true",
                       help=f"like --dry-run, but really sends the emails to the people in "
-                           f"{FILENAME_DRY_RUN_NAMES_EMAILS} instead, marked '{DRY_RUN_PREFIX}'")
+                           f"{F_DRY_RUN_NAMES_EMAILS} (in the group folder) instead, "
+                           f"marked '{DRY_RUN_PREFIX}'")
     args = parser.parse_args()
     dry = args.dry_run or args.dry_run_send
     if args.init:
-        init_files()
+        try:
+            init_group(args.init)
+        except ValueError as e:
+            sys.exit(f"Oh no! {e}")
+        print(f"Now edit the files in {ADDITIONAL_FILES}/{args.init}/, then run "
+              f"`python super_santa_bot.py {shlex.quote(args.init)} --dry-run`")
         return
+    try:
+        group = choose_group(args.group)
+    except ValueError as e:
+        sys.exit(f"Oh no! {e}")
+    gdir = os.path.join(ADDITIONAL_FILES, group)
+    path = lambda fname: os.path.join(gdir, fname)  # noqa: E731
+    print(f"Secret Santa group: {group}  ({gdir}/)")
 
     days = days_until_christmas()
     print(f"Only {days} days until Christmas!!!\n")
 
-    wishlists_link = read_first_line(FILENAME_WISHLISTS)
-    email_title = read_first_line(FILENAME_EMAIL_TITLE)
+    wishlists_link = read_first_line(path(F_WISHLISTS))
+    email_title = read_first_line(path(F_EMAIL_TITLE))
 
     if not confirm(f"this is the wishlists link {wishlists_link!r}?"):
-        sys.exit(f"Edit {FILENAME_WISHLISTS} to fix Santa Bot's memory.")
+        sys.exit(f"Edit {path(F_WISHLISTS)} to fix Santa Bot's memory.")
     if not confirm(f'this is the email title "{email_title}"?'):
-        sys.exit(f"Edit {FILENAME_EMAIL_TITLE} to fix Santa Bot's memory.")
+        sys.exit(f"Edit {path(F_EMAIL_TITLE)} to fix Santa Bot's memory.")
 
-    names_file = FILENAME_DRY_RUN_NAMES_EMAILS if args.dry_run_send else FILENAME_NAMES_EMAILS
+    names_file = path(F_DRY_RUN_NAMES_EMAILS if args.dry_run_send else F_NAMES_EMAILS)
     if args.dry_run_send:
         print(f"\n*** DRY RUN SEND: emails go ONLY to the people in {names_file}, "
               f"marked '{DRY_RUN_PREFIX}' ***\n")
     try:
         names, emails = get_names_emails(names_file)
     except FileNotFoundError:
-        sys.exit(f"Couldn't find {names_file}. Run `python super_santa_bot.py --init` "
-                 f"to create it from its template, then edit it.")
+        sys.exit(f"Couldn't find {names_file}. Copy it from "
+                 f"{ADDITIONAL_FILES}/{TEMPLATES_DIR}/ and edit it.")
     for name, email in zip(names, emails):
         print(f"{name}, {email}")
     if not confirm("these are your people?"):
         sys.exit(f"Edit {names_file} to fix Santa Bot's memory.")
 
-    couples = get_couples(FILENAME_COUPLES)
-    families = get_families(FILENAME_CHILDREN)
+    couples = get_couples(path(F_COUPLES))
+    families = get_families(path(F_CHILDREN))
     if args.dry_run_send:
         couples, families = filter_to_names(names, couples, families)
         print("\n(dry run list: only couples/families made up of people on it are used)")
@@ -371,13 +444,13 @@ def main():
     for a, b in couples:
         print(f"  {a} & {b}")
     if not confirm("these are your couples?"):
-        sys.exit(f"Edit {FILENAME_COUPLES} to fix Santa Bot's memory.")
+        sys.exit(f"Edit {path(F_COUPLES)} to fix Santa Bot's memory.")
 
     print("\nfamilies (parents can't get their children, or vice versa):")
     for parents, children in families:
         print(f"  {' & '.join(parents)} -> {', '.join(children)}")
     if not confirm("these are your families?"):
-        sys.exit(f"Edit {FILENAME_CHILDREN} to fix Santa Bot's memory.")
+        sys.exit(f"Edit {path(F_CHILDREN)} to fix Santa Bot's memory.")
 
     try:
         validate_inputs(names, emails, couples, families)
@@ -389,8 +462,11 @@ def main():
     if args.dry_run:
         host_email, password = "dry-run@example.com", ""
     else:
-        host_email, password = get_host_email_password(FILENAME_HOST_EMAIL_AUTH)
-    with open(FILENAME_EMAIL_OUTLINE, encoding="utf-8") as f:
+        try:
+            host_email, password = get_host_email_password(find_host_auth_file(gdir))
+        except (FileNotFoundError, ValueError) as e:
+            sys.exit(f"Oh no! {e}")
+    with open(path(F_EMAIL_OUTLINE), encoding="utf-8") as f:
         email_outline = f.read()
     messages = []
     for giver, receiver, to_email in zip(names, receivers, emails):
