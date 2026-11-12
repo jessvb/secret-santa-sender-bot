@@ -21,7 +21,7 @@ python super_santa_bot.py --init "Family 1"
 ```
    Everything inside `additional_files/` except `templates/` is in `.gitignore`, so your friends' emails, your password, and your secret links never get committed. (The one exception is each group's `email.html`—see below!) In the names, couples, children, link, and subject files, lines starting with `#` are comments (the templates use them to explain themselves).
 2. Now edit the files in your group's folder:
-    - `names_emails.csv`: names (column 1) and email addresses (column 2) of the gift-givers, one per line. Names must be unique.
+    - `names_emails.csv`: names (column 1) and email addresses (column 2 and on) of the gift-givers, one per line. Names must be unique. Give someone several addresses and they all get that person's email, e.g. `Kid,mom@example.com,dad@example.com` (handy for kids whose parents want to see it too).
     - `couples.txt` (optional): pairs who shouldn't get each other, in the format below (delete the examples if you have no couples):
     ```
     Mary, Joseph

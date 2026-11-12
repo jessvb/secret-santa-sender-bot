@@ -132,13 +132,19 @@ def find_host_auth_file(group_dir, base=ADDITIONAL_FILES):
 
 
 def get_names_emails(filename):
-    """Read `name,email` rows."""
+    """Read `name,email[,email...]` rows. Returns (names, emails) where emails
+    holds one list of addresses per person (repeats within a row are dropped)."""
     names, emails = [], []
     for row in csv.reader(read_data_lines(filename)):
-        if len(row) < 2 or not row[0].strip() or not row[1].strip():
-            raise ValueError(f"{filename}: expected 'name,email', got {row!r}")
+        addresses = []
+        for cell in row[1:]:
+            cell = cell.strip()
+            if cell and cell.lower() not in [a.lower() for a in addresses]:
+                addresses.append(cell)
+        if not row or not row[0].strip() or not addresses:
+            raise ValueError(f"{filename}: expected 'name,email[,email...]', got {row!r}")
         names.append(row[0].strip())
-        emails.append(row[1].strip())
+        emails.append(addresses)
     return names, emails
 
 
@@ -198,13 +204,16 @@ def validate_inputs(names, emails, couples, families=()):
     if dupes:
         raise ValueError(f"duplicate names (pairing works by name): {dupes}")
     warnings = []
-    lowered_emails = [e.lower() for e in emails]
-    dupe_emails = sorted({e for e in lowered_emails if lowered_emails.count(e) > 1})
-    for e in dupe_emails:
-        sharers = [n for n, x in zip(names, lowered_emails) if x == e]
+    owners = {}  # lowercased address -> people who list it
+    for name, addresses in zip(names, emails):
+        for e in addresses:
+            owners.setdefault(e.lower(), []).append(name)
+    for e, sharers in sorted(owners.items()):
+        if len(sharers) < 2:
+            continue
         warnings.append(f"{e} is shared by {', '.join(sharers)} (fine if a parent is "
                         f"receiving for their child; each person still gets their own email)")
-    for e in emails:
+    for e in (a for addresses in emails for a in addresses):
         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", e):
             raise ValueError(f"doesn't look like an email address: {e!r}")
     known = set(lowered)
@@ -360,10 +369,11 @@ def filter_to_names(names, couples, families):
     return kept_couples, kept_families
 
 
-def build_message(host_email, to_email, subject, html_body):
+def build_message(host_email, to_emails, subject, html_body):
+    """to_emails is a list of addresses; they all get the same message."""
     msg = MIMEMultipart("alternative")
     msg["From"] = host_email
-    msg["To"] = to_email
+    msg["To"] = ", ".join(to_emails)
     msg["Subject"] = subject
     # plain text first, HTML last: clients show the last part they support
     msg.attach(MIMEText(html_to_plain(html_body), "plain", "utf-8"))
@@ -380,7 +390,8 @@ def send_all(host_email, password, messages):
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=SMTP_TIMEOUT_SECONDS) as s:
         s.starttls(context=context)
         s.login(host_email, password)
-        for to_email, msg in messages:
+        for to_emails, msg in messages:
+            to_email = ", ".join(to_emails)
             try:
                 s.send_message(msg)
                 sent.append(to_email)
@@ -460,7 +471,7 @@ def main():
              else "the REAL list" + (" (nothing will be sent in a --dry-run)" if args.dry_run else ""))
     print(f"people from {names_file}, {which}:")
     for name, email in zip(names, emails):
-        print(f"  {name}, {email}")
+        print(f"  {name}, {', '.join(email)}")
     if not confirm("these are your people?"):
         sys.exit(f"Edit {names_file} to fix Santa Bot's memory.")
 
@@ -502,12 +513,12 @@ def main():
     with open(email_path, encoding="utf-8") as f:
         email_outline = f.read()
     messages = []
-    for giver, receiver, to_email in zip(names, receivers, emails):
+    for giver, receiver, to_emails in zip(names, receivers, emails):
         body = render_email(email_outline, giver, receiver, days, wishlists_link)
         subject = email_title
         if args.dry_run_send:
             subject, body = mark_dry_run(subject, body)
-        messages.append((to_email, build_message(host_email, to_email, subject, body)))
+        messages.append((to_emails, build_message(host_email, to_emails, subject, body)))
 
     if dry:
         print("\ndry run draw (shown ONLY because this is a dry run; a real run never prints this):")

@@ -6,7 +6,7 @@ import unittest
 from super_santa_bot import (choose_group, find_email_outline, find_host_auth_file, init_group, list_groups,
                              check_assignment, days_until_christmas, get_families,
                              filter_to_names, is_couple, is_parent_child, mark_dry_run, make_the_magic,
-                             render_email, validate_inputs)
+                             render_email, validate_inputs, get_names_emails, build_message)
 from datetime import date
 
 NAMES = ["Mary", "Joseph", "Rudolf", "Dasher", "Blitzen", "Mr. Claus", "Mrs. Claus"]
@@ -80,7 +80,7 @@ class Families(unittest.TestCase):
                                          [(["p"], ["c"])]))
 
     def test_validation(self):
-        emails = [f"{n}@x.com" for n in "pcx"]
+        emails = [[f"{n}@x.com"] for n in "pcx"]
         with self.assertRaises(ValueError):
             validate_inputs(list("pcx"), emails, [], [(["p"], ["ghost"])])
         with self.assertRaises(ValueError):
@@ -181,16 +181,52 @@ class Groups(unittest.TestCase):
 class Validation(unittest.TestCase):
     def test_duplicates_and_unknown_couples(self):
         with self.assertRaises(ValueError):
-            validate_inputs(["a", "A"], ["a@x.com", "b@x.com"], [])
+            validate_inputs(["a", "A"], [["a@x.com"], ["b@x.com"]], [])
         with self.assertRaises(ValueError):
-            validate_inputs(["a", "b"], ["a@x.com", "b@x.com"], [("a", "zed")])
-        self.assertEqual(validate_inputs(["a", "b"], ["a@x.com", "b@x.com"], []), [])
+            validate_inputs(["a", "b"], [["a@x.com"], ["b@x.com"]], [("a", "zed")])
+        self.assertEqual(validate_inputs(["a", "b"], [["a@x.com"], ["b@x.com"]], []), [])
 
     def test_shared_email_warns_but_is_allowed(self):
         warnings = validate_inputs(["mom", "kid", "dad"],
-                                   ["Fam@x.com", "fam@x.com", "dad@x.com"], [])
+                                   [["Fam@x.com"], ["fam@x.com"], ["dad@x.com"]], [])
         self.assertEqual(len(warnings), 1)
         self.assertIn("mom, kid", warnings[0])
+
+
+class MultipleEmails(unittest.TestCase):
+    def test_parse_multiple_addresses_per_person(self):
+        import os, tempfile
+        with tempfile.TemporaryDirectory() as d:
+            f = os.path.join(d, "n.csv")
+            with open(f, "w") as fh:
+                fh.write("Mom,mom@x.com\nDad,dad@x.com\n"
+                         "Kid, mom@x.com , dad@x.com,MOM@x.com,\n")
+            names, emails = get_names_emails(f)
+        self.assertEqual(names, ["Mom", "Dad", "Kid"])
+        self.assertEqual(emails, [["mom@x.com"], ["dad@x.com"], ["mom@x.com", "dad@x.com"]])
+
+    def test_row_needs_an_address(self):
+        import os, tempfile
+        with tempfile.TemporaryDirectory() as d:
+            f = os.path.join(d, "n.csv")
+            with open(f, "w") as fh:
+                fh.write("Mom,\n")
+            with self.assertRaises(ValueError):
+                get_names_emails(f)
+
+    def test_bad_address_in_any_position_is_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_inputs(["a", "b"], [["a@x.com", "oops"], ["b@x.com"]], [])
+
+    def test_shared_addresses_across_people_warn_once_each(self):
+        warnings = validate_inputs(
+            ["mom", "dad", "kid"],
+            [["mom@x.com"], ["dad@x.com"], ["mom@x.com", "dad@x.com"]], [])
+        self.assertEqual(len(warnings), 2)
+
+    def test_message_goes_to_every_address(self):
+        msg = build_message("h@x.com", ["mom@x.com", "dad@x.com"], "hi", "<p>x</p>")
+        self.assertEqual(msg["To"], "mom@x.com, dad@x.com")
 
 
 class Email(unittest.TestCase):

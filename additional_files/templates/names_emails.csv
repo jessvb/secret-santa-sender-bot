@@ -1,5 +1,7 @@
 # Names and email addresses of everyone in the exchange, one person per line:
 #   name,email
+# Add more addresses after the first to send the same email to all of them:
+#   name,email1,email2
 # Lines starting with # and blank lines are ignored. Names must be unique.
 Mary,mary@example.com
 Joseph,joseph@example.com
