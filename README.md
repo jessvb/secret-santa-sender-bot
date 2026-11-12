@@ -63,7 +63,7 @@ python super_santa_bot.py "Family 1"
 - Next, a list of couples will appear—Make sure they're correct and hit `y` and enter
 - Then a list of families will appear (parents -> kids)—check it and hit `y` and enter
 - Continue doing this until the Sender Bot is ready to send
-- If something's off, the bot tells you which file to fix. It also refuses to play if names are duplicated, a couple or family mentions someone who isn't playing, or an email address looks funny—and if the couples and families make a fair draw impossible (like only two people who are a couple, or a parent and their one child), it says so instead of getting stuck 🦌💤
+- If something's off, the bot tells you which file to fix. It also refuses to play if names are duplicated (a shared email address only gets a warning, so a parent can receive for their child), a couple or family mentions someone who isn't playing, or an email address looks funny—and if the couples and families make a fair draw impossible (like only two people who are a couple, or a parent and their one child), it says so instead of getting stuck 🦌💤
 
 And off into the world your emails will go! 🦌🦌🦌🦌🦌🛷🎅 Merry Christmas!
 

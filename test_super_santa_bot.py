@@ -184,7 +184,13 @@ class Validation(unittest.TestCase):
             validate_inputs(["a", "A"], ["a@x.com", "b@x.com"], [])
         with self.assertRaises(ValueError):
             validate_inputs(["a", "b"], ["a@x.com", "b@x.com"], [("a", "zed")])
-        validate_inputs(["a", "b"], ["a@x.com", "b@x.com"], [])
+        self.assertEqual(validate_inputs(["a", "b"], ["a@x.com", "b@x.com"], []), [])
+
+    def test_shared_email_warns_but_is_allowed(self):
+        warnings = validate_inputs(["mom", "kid", "dad"],
+                                   ["Fam@x.com", "fam@x.com", "dad@x.com"], [])
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("mom, kid", warnings[0])
 
 
 class Email(unittest.TestCase):

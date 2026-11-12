@@ -186,16 +186,24 @@ def get_host_email_password(filename):
 
 
 def validate_inputs(names, emails, couples, families=()):
-    """Catch input mistakes that would silently produce wrong pairings."""
+    """Catch input mistakes that would silently produce wrong pairings.
+
+    Raises ValueError for fatal problems; returns a list of non-fatal warnings
+    (e.g. a parent's email shared with their child).
+    """
     if len(names) < 2:
         raise ValueError("need at least 2 participants")
     lowered = [n.lower() for n in names]
     dupes = sorted({n for n in lowered if lowered.count(n) > 1})
     if dupes:
         raise ValueError(f"duplicate names (pairing works by name): {dupes}")
-    dupe_emails = sorted({e.lower() for e in emails if [x.lower() for x in emails].count(e.lower()) > 1})
-    if dupe_emails:
-        raise ValueError(f"duplicate email addresses: {dupe_emails}")
+    warnings = []
+    lowered_emails = [e.lower() for e in emails]
+    dupe_emails = sorted({e for e in lowered_emails if lowered_emails.count(e) > 1})
+    for e in dupe_emails:
+        sharers = [n for n, x in zip(names, lowered_emails) if x == e]
+        warnings.append(f"{e} is shared by {', '.join(sharers)} (fine if a parent is "
+                        f"receiving for their child; each person still gets their own email)")
     for e in emails:
         if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", e):
             raise ValueError(f"doesn't look like an email address: {e!r}")
@@ -213,6 +221,7 @@ def validate_inputs(names, emails, couples, families=()):
         overlap = {p.lower() for p in parents} & {c.lower() for c in children}
         if overlap:
             raise ValueError(f"{sorted(overlap)} listed as both parent and child in the same family")
+    return warnings
 
 
 # ------------------------------------------------------------------ matching
@@ -473,10 +482,14 @@ def main():
         sys.exit(f"Edit {path(F_CHILDREN)} to fix Santa Bot's memory.")
 
     try:
-        validate_inputs(names, emails, couples, families)
+        warnings = validate_inputs(names, emails, couples, families)
         receivers = make_the_magic(names, couples, families)
     except ValueError as e:
         sys.exit(f"Oh no! {e}")
+    for w in warnings:
+        print(f"Warning: {w}")
+    if warnings and not confirm("carry on anyway?"):
+        sys.exit(f"Edit {names_file} to fix Santa Bot's memory.")
     print("ssb made the magic! everyone's paired up :)")
 
     if args.dry_run:
