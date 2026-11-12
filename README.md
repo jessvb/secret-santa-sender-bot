@@ -27,10 +27,11 @@ python super_santa_bot.py --init "Family 1"
     Mary, Joseph
     Mr. Claus, Mrs. Claus
     ```
-    - `children.txt` (optional): families, one per line, with the parents on the left of the colon and the kids on the right. Parents can't get their kids and kids can't get their parents (in either direction!), but siblings can still get each other. A single parent is fine too (just put one name before the colon):
+    - `children.txt` (optional): families, one per line, with the parents on the left of the colon and the kids on the right. Parents can't get their kids and kids can't get their parents (in either direction!), but siblings can still get each other. You can put as many "parents" as you like before the colon: one, two, or grandparents, aunts, godparents (anyone who shouldn't get those kids, or vice versa):
     ```
     Mary, Joseph: James, Jude, Jesus
     Mr. Claus, Mrs. Claus: Elf1, Elf2
+    Mom, Dad, Grandma, Grandpa: Kid1, Kid2
     ```
       Everyone has to be in `names_emails.csv`, and (like couples) names are matched ignoring upper/lowercase. Delete the examples if nobody has kids.
     - `wishlistslink.txt`: a link to a page with everyone's wishlists (it can really be anything!), and `emailtitle.txt`: the email subject line. Only the first non-comment line of each is used.

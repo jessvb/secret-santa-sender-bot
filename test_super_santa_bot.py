@@ -98,6 +98,26 @@ class Families(unittest.TestCase):
         self.assertEqual(get_families("/nonexistent.txt"), [])
 
 
+class Grandparents(unittest.TestCase):
+    NAMES = ["P1", "P2", "G1", "C1", "C2", "P3", "P4", "G2", "G3", "C3", "Solo"]
+    FAMS = [(["P1", "P2", "G1"], ["C1", "C2"]), (["P3", "P4", "G2", "G3"], ["C3"])]
+
+    def test_parse_many_parents(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("P1, P2, G1: C1, C2\nP3, P4, G2, G3: C3\n")
+        try:
+            self.assertEqual(get_families(f.name), self.FAMS)
+        finally:
+            os.unlink(f.name)
+
+    def test_nobody_gets_their_grandkids_or_grandparents(self):
+        for seed in range(500):
+            r = make_the_magic(self.NAMES, [], self.FAMS, rng=random.Random(seed))
+            self.assertEqual(check_assignment(self.NAMES, r, [], self.FAMS), [])
+            for giver, receiver in zip(self.NAMES, r):
+                self.assertFalse(is_parent_child(giver, receiver, self.FAMS))
+
+
 class DryRunSend(unittest.TestCase):
     def test_mark(self):
         subj, body = mark_dry_run("Hi", "<html>\n<head></head>\n<body>\nhello\n</body>\n</html>")
